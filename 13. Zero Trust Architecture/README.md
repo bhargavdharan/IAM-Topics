@@ -2,107 +2,220 @@
 
 ## What Is Zero Trust?
 
-**Zero Trust** is a security model that eliminates the concept of a trusted network. Instead of assuming that everything inside the corporate network is safe, Zero Trust verifies every user, device, and transaction — every single time.
+**Zero Trust** is a security framework and mindset that assumes no user, device, or network location should be implicitly trusted — regardless of whether they are inside or outside the organizational network. Every access request must be verified, authenticated, and authorized before access is granted.
 
-The core principle is simple: **Never trust, always verify.**
+The traditional model assumed: "Inside the network = trusted. Outside the network = untrusted." Zero Trust rejects this assumption. Attackers who breach the perimeter should not automatically gain access to everything inside.
+
+The core principle of Zero Trust is **"Never trust, always verify."**
 
 ---
 
 ## Why Learn This?
 
-The traditional security model — a strong perimeter with free movement inside — no longer works. Cloud services, remote work, and mobile devices have dissolved the perimeter. Attackers who breach the perimeter can move freely inside.
+Modern IT environments have eroded the traditional network perimeter:
+- Remote work connects users from home networks, coffee shops, airports
+- Cloud services exist outside the corporate data center
+- Mobile devices access corporate data from anywhere
+- Partners and contractors need access without VPNs
+- Insiders with legitimate access can be threats
 
-Zero Trust addresses this by:
-- Eliminating implicit trust based on network location
-- Enforcing least privilege at every step
-- Assuming breaches and designing for containment
+Understanding Zero Trust is essential for:
+- Designing modern security architectures
+- Protecting cloud-native applications
+- Implementing least privilege at scale
+- Reducing blast radius of breaches
+- Meeting evolving compliance requirements
 
 ---
 
 ## Core Concepts
 
-### The Three Principles of Zero Trust
+### The Three Pillars of Zero Trust
 
-| Principle | Meaning | Application |
-|-----------|---------|-------------|
-| **Verify Explicitly** | Always authenticate and authorize based on all available data | Check identity, device health, and behavior on every request |
-| **Use Least Privilege Access** | Grant only the minimum access needed, and only for the required time | Just-in-time access, time-limited tokens |
-| **Assume Breach** | Design as if attackers are already inside | Micro-segmentation, continuous monitoring |
+**1. Verify Explicitly**
+Every access request must be authenticated and authorized based on all available data:
+- User identity
+- Device health and compliance
+- Location
+- Risk signals
+- Request context
 
-### Zero Trust Tenets (NIST SP 800-207)
+No access is granted based on network location alone.
 
-1. All data sources and computing services are resources
-2. All communication is secured regardless of network location
-3. Access to individual resources is granted on a per-session basis
-4. Access is determined by dynamic policy
-5. The enterprise monitors and measures the integrity and security posture of all assets
-6. All resource authentication and authorization are dynamic and strictly enforced
-7. The enterprise collects as much information as possible for analysis
+**2. Use Least Privilege Access**
+Users and systems receive only the minimum access needed, and only for the time needed:
+- Just-in-time access
+- Just-enough-access (role-based, attribute-based)
+- Time-limited permissions
+- Continuous verification
 
-### Continuous Verification
+**3. Assume Breach**
+Design systems as if an attacker is already inside:
+- Segment networks to limit lateral movement
+- Encrypt all data in transit and at rest
+- Monitor everything for anomalies
+- Minimize blast radius
 
-Traditional security: Verify once at login, then trust.
-Zero Trust: Verify continuously.
+### Zero Trust Architecture Components
 
-| Signal | Low Trust | High Trust |
-|--------|-----------|------------|
-| **Device** | Personal tablet, no antivirus | Corporate laptop, fully patched |
-| **Location** | Unknown country | Known office or home |
-| **Behavior** | Downloading entire database | Normal work patterns |
-| **Time** | 3 AM on weekend | 10 AM on weekday |
-| **MFA** | None | Hardware key + biometric |
+| Component | Function | Example |
+|-----------|----------|---------|
+| **Identity Provider** | Authenticates users and issues tokens | Azure AD, Okta, Ping |
+| **Device Directory** | Manages and assesses device compliance | Microsoft Intune, Jamf, VMware Workspace ONE |
+| **Policy Engine** | Evaluates access requests against policies | Azure AD Conditional Access, Okta Policies |
+| **Policy Administrator** | Enforces policy decisions | WAF, application gateway, proxy |
+| **Signal Collection** | Gathers risk signals | Endpoint detection, threat intelligence, user behavior |
 
-**Result:** Low trust score → Step-up authentication or deny. High trust score → Smooth access.
+### The Zero Trust Control Plane
+
+```
+                    ┌─────────────────────┐
+                    │   Access Request    │
+                    │ (User + Device +    │
+                    │  Resource + Context)│
+                    └──────────┬──────────┘
+                               │
+                    ┌──────────▼──────────┐
+                    │   Policy Engine     │
+                    │  Evaluates signals: │
+                    │  - Identity valid?  │
+                    │  - Device healthy?  │
+                    │  - Location normal? │
+                    │  - Risk score?      │
+                    │  - MFA required?    │
+                    └──────────┬──────────┘
+                               │
+                    ┌──────────┴──────────┐
+                    │    Decision         │
+                    │  Allow / Deny /     │
+                    │  Step-up Auth /     │
+                    │  Limited Access     │
+                    └──────────┬──────────┘
+                               │
+                    ┌──────────▼──────────┐
+                    │   Access Granted    │
+                    │  with conditions:   │
+                    │  - Session timeout  │
+                    │  - Scope limits     │
+                    │  - Monitoring active│
+                    └─────────────────────┘
+```
+
+### Identity in Zero Trust
+
+Identity is the primary security perimeter in Zero Trust:
+- **Strong authentication:** MFA required for all users, all the time
+- **Dynamic authorization:** Access decisions based on real-time risk
+- **Privileged access protection:** PAM integrated into Zero Trust
+- **Continuous authentication:** Re-evaluate trust throughout the session
+
+### Device Trust
+
+Zero Trust requires knowing and trusting the device:
+
+| Device Signal | What It Tells You | Risk If Missing |
+|--------------|-------------------|-----------------|
+| **Compliance status** | Device meets security policy (patched, encrypted, managed) | Outdated, vulnerable device accessing data |
+| **Health attestation** | No malware detected, no suspicious processes | Compromised device used to steal data |
+| **Location** | Device is where user is expected to be | Stolen device or VPN bypass |
+| **Certificate** | Device is corporate-issued and registered | Personal, unmanaged device |
 
 ### Micro-Segmentation
 
-Instead of one big network, create many small isolated zones. If an attacker breaches the web server, they cannot reach the database without passing additional checks.
+Micro-segmentation divides the network into small, isolated zones:
+- Each application or workload has its own security boundary
+- East-west traffic (within the network) is controlled
+- Even if an attacker breaches one segment, they cannot move laterally
+- Policies define exactly which services can communicate
+
+**Example:**
+```
+Traditional:  [Internet] → [Firewall] → [Trusted Internal Network]
+                                              (Everything accessible)
+
+Zero Trust:   [Internet] → [Firewall] → [Web Tier] → [App Tier] → [DB Tier]
+                           Each tier isolated; only allowed connections
+```
 
 ---
 
 ## How It Works
 
-### The Policy Decision Point (PDP)
+### Continuous Authentication
 
-The PDP is the brain of Zero Trust. For every access request, it evaluates:
-- Identity strength (MFA method, risk score)
-- Device health (managed, compliant, patched)
-- Context (location, time, network)
-- Resource sensitivity
+Zero Trust does not authenticate once and forget. Trust is continuously re-evaluated:
 
-**Example scoring:**
+| Trigger | Action |
+|---------|--------|
+| User switches device | Re-authenticate and re-assess device trust |
+| Device becomes non-compliant | Block or limit access until compliance restored |
+| Anomalous behavior detected | Require step-up authentication or block |
+| Session timeout | Re-authenticate |
+| Risk score increases | Restrict access, require MFA, or terminate session |
+| Location changes unexpectedly | Flag for review, require additional verification |
+
+### Conditional Access Policies
+
+Conditional Access is Microsoft's implementation of Zero Trust policy evaluation:
+
+**Policy structure:**
 ```
-Hardware key auth: +20 points
-Managed device: +15 points
-Corporate network: +10 points
-Business hours: +10 points
-High-risk user: -20 points
-Unmanaged device: -15 points
-
-Score >= 80: ALLOW
-Score 50-79: STEP_UP_AUTH
-Score < 50: DENY
+IF (user is in Finance group)
+   AND (device is compliant)
+   AND (location is trusted)
+   AND (risk score is low)
+THEN allow access to FinanceApp
+     require MFA
+     session expires in 4 hours
+ELSE block access
+     OR require password reset
+     OR allow limited read-only access
 ```
 
-### Software-Defined Perimeter (SDP)
+**Common conditions:**
+- User or group membership
+- Device platform (iOS, Android, Windows, macOS)
+- Device compliance status
+- Location (IP range, country, GPS)
+- Client application
+- Sign-in risk (real-time risk score)
+- User risk (historical risk assessment)
 
-SDP replaces traditional VPNs:
-- Each application is invisible until authenticated
-- No broad network access granted
-- Traffic routed optimally, not through corporate HQ
-- Every session continuously monitored
+### Zero Trust Network Access (ZTNA)
+
+ZTNA replaces traditional VPNs:
+
+**Traditional VPN:**
+- User connects to VPN concentrator
+- User is "inside" the network
+- User can access many internal resources
+- No per-application authorization
+
+**ZTNA:**
+- User connects to specific application through broker
+- Each application requires separate authorization
+- User never joins the corporate network
+- Access is granted per-application, per-session
+- All traffic is encrypted and logged
+
+**Benefits:**
+- Reduced attack surface (no broad network access)
+- Better visibility (all access logged)
+- No need to manage VPN infrastructure
+- Works from anywhere without network-level trust
 
 ---
 
 ## Where You See It
 
-| Product | Zero Trust Feature |
-|---------|-------------------|
-| **Microsoft Azure AD** | Conditional Access policies |
-| **Google BeyondCorp** | Context-aware access |
-| **Zscaler** | Zero Trust Network Access |
-| **Okta Identity Engine** | Risk-based authentication |
-| **VMware NSX** | Micro-segmentation |
+| Product | Zero Trust Capability | Use Case |
+|---------|----------------------|----------|
+| **Microsoft Azure AD** | Conditional Access, Identity Protection | Device compliance, risk-based policies |
+| **Zscaler Private Access** | ZTNA platform | Application-specific access without VPN |
+| **Cloudflare Access** | ZTNA and Zero Trust network | Per-application access policies |
+| **Google BeyondCorp** | Google's Zero Trust model | Device trust, context-aware access |
+| **Okta Identity Engine** | Risk-based policies, device trust | Adaptive authentication |
+| **Cisco Secure Access** | SD-Access with Zero Trust | Network micro-segmentation |
 
 ---
 
@@ -110,62 +223,90 @@ SDP replaces traditional VPNs:
 
 | Misconception | Reality |
 |--------------|---------|
-| "Zero Trust means zero access" | Zero Trust means verify before trusting, not block everything |
-| "Zero Trust is a product" | Zero Trust is an architecture and mindset, not a single tool |
-| "We need to replace everything" | Zero Trust is typically implemented incrementally |
-| "Zero Trust is only for cloud" | Zero Trust applies to on-premises, cloud, and hybrid environments |
+| "Zero Trust means trusting no one" | Zero Trust means "verify explicitly" before granting trust, not "deny everything." |
+| "Zero Trust replaces VPN" | Zero Trust principles can be implemented via ZTNA, which replaces VPN for many use cases. |
+| "Zero Trust is only for large enterprises" | Organizations of any size can implement Zero Trust principles: MFA, least privilege, device management. |
+| "Zero Trust is a product you buy" | Zero Trust is a strategy and architecture. Products enable it, but mindset and policy are essential. |
+| "Zero Trust means zero access" | Users still get access — but access is based on verification, not assumed from network location. |
+| "Implementing Zero Trust is all-or-nothing" | Zero Trust is a journey. Start with MFA, then add device compliance, then micro-segmentation. |
 
 ---
 
 ## How to Practice
 
-1. **Evaluate your current trust model**
-   - Do you trust devices based on network location?
-   - Do you verify identity on every resource access?
-   - What happens if an attacker gets inside your network?
+### Exercise 1: Assess Your Organization's Zero Trust Maturity
+Rate your organization on these dimensions (1-5 scale):
+- Identity: MFA deployment, passwordless readiness, identity protection
+- Devices: Device management coverage, compliance enforcement, health attestation
+- Applications: SSO adoption, session management, application protection
+- Network: Micro-segmentation, encryption, ZTNA vs VPN
+- Data: Classification, encryption, DLP
 
-2. **Design a Zero Trust policy for one application**
-   - Define the required trust score
-   - List the signals you would evaluate
-   - Determine what happens when trust is low
+Identify the highest-impact improvements.
 
-3. **Run the simulations**
-   - `zero_trust_engine.py` evaluates trust scores
-   - `micro_segment_sim.py` demonstrates network segmentation
+### Exercise 2: Design a Conditional Access Policy
+Design a policy for a financial analyst accessing a trading application:
+- What identity requirements? (MFA, passwordless?)
+- What device requirements? (Compliant, managed, specific OS?)
+- What location requirements? (Office only? Trusted countries?)
+- What risk considerations? (Real-time risk, user risk?)
+- What session controls? (Timeout, continuous access evaluation?)
+
+### Exercise 3: Map Attack Scenarios
+Consider these attack scenarios and how Zero Trust mitigates each:
+1. Phished credentials used to log in from abroad
+2. Compromised device connects to corporate application
+3. Insider attempts to access data outside their role
+4. Attacker breaches one server and tries lateral movement
+5. Stolen session cookie used from different device
+
+### Exercise 4: Run the Simulations
+- `zero_trust_engine.py` — Policy evaluation simulation
+- `device_trust_scorer.py` — Device compliance assessment
+- `micro_segment_sim.py` — Network micro-segmentation
 
 ---
 
 ## Projects
 
 ### `zero_trust_engine.py`
-Implements a Zero Trust policy engine:
-- Evaluates trust scores based on identity, device, and context
-- Makes dynamic access decisions
-- Implements continuous verification
+Simulates Zero Trust policy evaluation:
+- Multiple policy conditions (identity, device, location, risk)
+- Continuous authentication triggers
+- Decision outcomes: Allow, Block, Step-up, Limited
+- Audit logging of all decisions
+- Signal aggregation from multiple sources
 
 ### `device_trust_scorer.py`
-Scores device trustworthiness:
-- Checks management enrollment
-- Verifies compliance status
-- Generates device risk scores
+Assesses device compliance for Zero Trust:
+- Checks device attributes (OS version, patch level, encryption)
+- Evaluates against compliance policy
+- Calculates trust score
+- Recommends remediation actions
+- Simulates health attestation
 
 ### `micro_segment_sim.py`
-Simulates network micro-segmentation:
-- Creates isolated network zones
-- Enforces zone-to-zone policies
-- Simulates lateral movement attacks
-
-### `continuous_auth_monitor.py`
-Monitors sessions for risk changes:
-- Detects anomalous behavior mid-session
-- Triggers re-authentication when risk increases
+Models network micro-segmentation:
+- Defines network segments (web, app, database)
+- Specifies allowed traffic flows
+- Simulates lateral movement attempts
+- Evaluates blast radius of breaches
+- Demonstrates segmentation policy enforcement
 
 ---
 
 ## Check Your Understanding
 
-1. What is the core principle of Zero Trust? How does it differ from perimeter-based security?
-2. Name the three pillars of Zero Trust and explain each.
-3. What is micro-segmentation and how does it limit breach impact?
-4. How does continuous verification work? Give an example of when access might be revoked mid-session.
-5. What is a Software-Defined Perimeter and how is it better than a traditional VPN?
+1. What is the fundamental difference between traditional network security and Zero Trust? Why did the traditional model become insufficient?
+2. What are the three pillars of Zero Trust? Explain each with a concrete example.
+3. How does micro-segmentation prevent lateral movement? Compare a flat network with a micro-segmented network after a breach.
+4. What is ZTNA and how does it differ from traditional VPN? What are the security benefits?
+5. How does continuous authentication work in Zero Trust? Give three examples of triggers that would cause re-evaluation.
+6. Design a Conditional Access policy for a healthcare worker accessing patient records from a personal tablet at home.
+7. Why is identity considered the primary security perimeter in Zero Trust? What does this mean for authentication requirements?
+8. Describe how Zero Trust would handle these scenarios differently from traditional security:
+   a. An employee working from a coffee shop
+   b. A contractor accessing a specific application
+   c. A server in the data center calling an API
+9. What are the phases of a Zero Trust implementation journey? What would you implement first, second, and third?
+10. An attacker steals valid credentials and tries to log in from a new device in a different country. How would a Zero Trust architecture respond at each layer?
