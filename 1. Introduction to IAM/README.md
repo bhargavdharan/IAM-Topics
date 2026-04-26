@@ -1,310 +1,451 @@
-# 1. Introduction to Identity and Access Management
+# 1. Introduction to Identity and Access Management (IAM)
 
 ## What Is IAM?
 
-**Identity and Access Management (IAM)** is the comprehensive framework of policies, processes, and technologies that organizations use to manage digital identities and control access to resources. It ensures that the right individuals and systems can access the right resources at the right times for the right reasons.
+**Identity and Access Management (IAM)** is the framework of policies, processes, and technologies that ensures the right individuals have the right access to the right resources at the right time — and for the right reasons.
 
-At its foundation, IAM addresses two fundamental security questions:
-1. **Who are you?** — This is the realm of **identity** and **authentication**
-2. **What can you do?** — This is the realm of **authorization** and **access control**
+At its core, IAM answers three fundamental questions:
+1. **Who are you?** → Identity
+2. **How do I know it's really you?** → Authentication
+3. **What are you allowed to do?** → Authorization
 
-Every organization that operates digital systems — from a five-person startup to a multinational enterprise — needs IAM. Without it, there is no way to control who can access sensitive data, modify critical systems, or view confidential information.
+Every time you log into an application, swipe an access badge, or use facial recognition to unlock your phone, you are interacting with an IAM system. IAM is the invisible security layer that protects organizations from unauthorized access while enabling legitimate users to do their work.
 
 ---
 
-## Why Learn This?
+## Why Learn IAM?
 
-IAM is the **bedrock of cybersecurity**. No firewall, encryption scheme, or intrusion detection system can compensate for poor identity and access controls. Consider these scenarios:
+Identity-related breaches are among the most common and damaging cybersecurity incidents:
+- **81% of hacking-related breaches** involve stolen or weak credentials (Verizon DBIR)
+- **Identity is the new perimeter** — cloud and remote work have dissolved traditional network boundaries
+- **Compliance requirements** (SOX, HIPAA, PCI-DSS, GDPR) mandate strong identity controls
+- **Insider threats** — both malicious and accidental — are managed through IAM
 
-- A former employee's account remains active for three months after departure, allowing them to access customer data
-- A contractor accidentally gains admin privileges because roles were misconfigured
-- An auditor asks "Who has access to financial systems?" and the organization cannot answer definitively
-- A developer deploys code to production because there is no separation between development and deployment permissions
-
-All of these are IAM failures. Understanding IAM enables you to:
-- Design secure access architectures
-- Pass compliance audits (SOX, HIPAA, PCI-DSS, ISO 27001)
-- Prevent data breaches caused by identity mismanagement
-- Build career expertise in one of the most in-demand security domains
-
-**Career relevance:** See the root `README.md` for detailed IAM career paths including Support Engineer, Administrator, Analyst, Developer, Consultant, and Architect roles.
+IAM skills are foundational for cybersecurity, system administration, cloud architecture, and compliance roles. Understanding IAM enables you to design secure systems, troubleshoot access issues, and protect organizational assets.
 
 ---
 
 ## Core Concepts
 
-### The Five Stages of the IAM Lifecycle
+### Identity
 
-The IAM lifecycle describes the complete journey of an identity from creation to removal. Gaps or delays at any stage create security vulnerabilities.
+An **identity** is a digital representation of a user, device, application, or system. Every entity that needs to interact with resources must have an identity.
 
-#### Stage 1: Provision
-**What happens:** A new identity is created and assigned initial access based on role.
+**Types of identities:**
 
-**Real-world process:**
-- HR creates an employee record in the HRIS system
-- The IAM system detects the new hire and triggers provisioning
-- An account is created in Active Directory / Azure AD / Google Workspace
-- The user is assigned to appropriate groups based on their department and role
-- An email account is created
-- Access to standard applications (email, intranet, collaboration tools) is granted automatically
+| Identity Type | Description | Example |
+|--------------|-------------|---------|
+| **Human Identity** | Individual person | Employee Alice, contractor Bob, customer Carol |
+| **Machine Identity** | Non-human entity | Server, IoT device, container, virtual machine |
+| **Service Account** | Application identity | Database service account, backup agent, API consumer |
+| **Privileged Identity** | Account with elevated permissions | Domain administrator, root user, cloud owner |
 
-**What goes wrong:** Manual provisioning delays leave new hires without access on day one. Over-provisioning gives excessive initial permissions. Inconsistent provisioning across systems creates access gaps.
+**Identity Attributes:**
+Identities carry attributes that describe them:
+- **Unique Identifier:** Username, email, employee ID, UUID
+- **Personal Information:** Name, department, job title, location
+- **Organizational Attributes:** Manager, cost center, business unit
+- **Security Attributes:** Group memberships, roles, clearance level
+- **Lifecycle State:** Active, suspended, terminated, on-leave
 
-**Automation best practice:** Use HR-driven provisioning with role-based templates. When HR marks someone as hired in the system of record, IAM should automatically create accounts, assign roles, and grant baseline access within minutes.
+These attributes are used to make access decisions — not just "who is Alice?" but "what department is Alice in?", "who is her manager?", "is her account active?"
 
-#### Stage 2: Authenticate
-**What happens:** The system verifies that the user is who they claim to be.
+### Authentication vs Authorization
 
-**Real-world process:**
-- User enters username and password
-- System validates credentials against the directory service
-- If MFA is enabled, user provides second factor (TOTP code, push approval, hardware key)
-- System evaluates risk signals (location, device, time, behavior)
-- Upon successful authentication, system issues a session token
+These two concepts are foundational to IAM and are frequently confused. Understanding the difference is critical.
 
-**What goes wrong:** Weak password policies allow easily guessed credentials. MFA is not enforced for privileged accounts. Risk signals are ignored, allowing compromised credentials to be used from unusual locations.
+**Authentication (AuthN): Proving WHO you are**
 
-#### Stage 3: Authorize
-**What happens:** The system determines what resources the authenticated user can access and what operations they can perform.
+Authentication is the process of verifying that a claimed identity is genuine. It answers: **"Are you really who you say you are?"**
 
-**Real-world process:**
-- User attempts to open a file, application, or API endpoint
-- System checks the user's roles, groups, and direct permissions
-- System evaluates policies (RBAC, ABAC, or both)
-- System logs the access decision
-- If allowed, access is granted; if denied, user sees "Access Denied"
+Authentication mechanisms use **factors** — categories of evidence:
 
-**What goes wrong:** Over-permissioning (giving users more access than needed) is rampant. Role definitions are outdated. Temporary access grants become permanent. There is no regular review of who has what access.
+| Factor Category | What It Is | Examples |
+|----------------|-----------|----------|
+| **Something you KNOW** | Information only the user should know | Password, PIN, security question answer |
+| **Something you HAVE** | Physical object in the user's possession | Smartphone, smart card, hardware token, YubiKey |
+| **Something you ARE** | Biological characteristic | Fingerprint, face, iris, voice, palm print |
+| **Something you DO** | Behavioral pattern | Typing rhythm, mouse movements, gait |
+| **Somewhere you ARE** | Geographic location | GPS coordinates, IP address range |
 
-#### Stage 4: Monitor
-**What happens:** The system tracks and logs all identity-related activities for audit, compliance, and security detection.
+**Single-factor authentication** uses one factor (typically password). **Multi-factor authentication (MFA)** uses two or more factors from different categories. MFA is significantly stronger because compromising one factor does not grant access.
 
-**Real-world process:**
-- Every login is logged with timestamp, IP address, device information, and result
-- Every access decision (allowed or denied) is recorded
-- Privileged operations are flagged for additional review
-- Anomalies trigger alerts (impossible travel, unusual access patterns, after-hours admin activity)
-- Logs are retained according to compliance requirements
+**Authentication establishes trust:** After successful authentication, the system creates a **session** — a temporary trusted state that remembers the user is authenticated without requiring credentials for every action.
 
-**What goes wrong:** Logs are incomplete or missing. Alerts are not configured. No one reviews privileged activity. Log retention does not meet compliance requirements.
+---
 
-#### Stage 5: Deprovision
-**What happens:** Access is completely removed when the identity is no longer needed.
+**Authorization (AuthZ): Determining WHAT you can do**
 
-**Real-world process:**
-- HR terminates employee in HRIS
-- IAM system detects termination and triggers deprovisioning workflow
-- User account is disabled in all systems
-- Access tokens and sessions are invalidated
-- User is removed from all groups and roles
-- Email forwarding or delegation is configured if needed
-- Manager is notified of completion
+Authorization is the process of determining what actions an authenticated identity is permitted to perform. It answers: **"Now that I know who you are, what are you allowed to do?"**
 
-**What goes wrong:** The most common IAM failure. Accounts remain active for days, weeks, or months after termination. Service accounts for completed projects are never cleaned up. Contractors retain access after contract end.
+Authorization happens **AFTER** authentication. You cannot authorize someone if you do not know who they are.
 
-**Critical metric:** Time-to-deprovision. Best practice is within minutes of termination; many organizations take days or weeks.
+**Authorization decisions consider:**
+- **Identity:** Who is requesting access?
+- **Resource:** What are they trying to access?
+- **Action:** What are they trying to do? (read, write, delete, execute)
+- **Context:** When, where, and how is the request made?
+- **Policy:** What rules govern this access?
 
-### Core IAM Vocabulary
+**Example of the distinction:**
 
-| Term | Definition | Example | Why It Matters |
-|------|-----------|---------|---------------|
-| **Identity** | A unique digital representation of a user, device, or service | `jdoe@company.com` | Without identity, there is nothing to authenticate or authorize |
-| **Credential** | Proof that an identity is genuine | Password, fingerprint, certificate | Credentials are what attackers steal; protecting them is paramount |
-| **Authentication** | The process of verifying identity | Entering username + password | First line of defense; determines if access proceeds |
-| **Authorization** | The decision to grant or deny access | Checking if user can view a file | Second line of defense; enforces least privilege |
-| **Accounting/Audit** | Tracking and logging actions | Recording who downloaded what file when | Provides forensic evidence and compliance proof |
-| **Principal** | Any entity that can be authenticated | User, service account, computer | IAM policies apply to principals |
-| **Subject** | The active principal in a session | Alice while logged in | Used in access control decisions |
+| Scenario | Authentication | Authorization |
+|----------|---------------|---------------|
+| Alice enters her password to log in | ✓ Verifies Alice's identity | — |
+| Alice tries to view a document | — | ✓ Checks if Alice has read permission |
+| Alice tries to delete a document | — | ✓ Checks if Alice has delete permission (denied) |
+| Alice's manager tries to view the same document | ✓ Verifies manager's identity | ✓ Checks manager's permissions (granted) |
 
-### Identity Types
+**Key insight:** Authentication is about identity verification. Authorization is about permission enforcement. Both are required for secure access.
 
-**Human Identities**
-- Employees, contractors, customers, partners, vendors
-- Most visible identity type
-- Susceptible to social engineering and phishing
-- Require lifecycle management from onboarding to offboarding
+### The Principle of Least Privilege (PoLP)
 
-**Machine Identities**
-- Servers, applications, APIs, microservices, IoT devices, containers
-- Often created at machine speed (thousands in cloud environments)
-- Frequently over-permissioned because developers grant broad access "just in case"
-- Often forgotten during decommissioning
-- Growing faster than human identities in cloud-native environments
+**The Principle of Least Privilege** is the foundational security principle that states: **every user, application, and system should have ONLY the minimum permissions necessary to perform their legitimate functions — and no more.**
 
-**Privileged Identities**
-- System administrators, domain admins, root accounts, database administrators
-- Service accounts with elevated permissions
-- Often shared among teams (which eliminates accountability)
-- Highest-value targets for attackers
-- Require enhanced protection: vaulting, JIT access, session recording
+**Why Least Privilege matters:**
+- **Breach containment:** If an account is compromised, the damage is limited to what that account can access
+- **Insider threat reduction:** Employees cannot accidentally or maliciously access data outside their role
+- **Operational stability:** Restricted permissions prevent accidental configuration changes
+- **Compliance:** Most regulatory frameworks require least privilege
+- **Audit simplicity:** Fewer permissions mean simpler audits and clearer accountability
+
+**What Least Privilege looks like in practice:**
+
+| Role | What they NEED | What they should NOT have |
+|------|---------------|--------------------------|
+| **Marketing Employee** | Read marketing materials, write to shared drive | Access to financial systems, HR records, production servers |
+| **Database Administrator** | Manage database instances, backups, user accounts | Domain admin rights, access to source code, ability to approve invoices |
+| **Software Developer** | Read/write source code, deploy to staging | Production database access, ability to modify payroll, approve vendor payments |
+| **Finance Analyst** | Read financial reports, run analysis queries | Ability to modify transactions, access customer PII, modify system configurations |
+| **Help Desk L1** | Reset passwords, unlock accounts, view user info | Ability to create admin accounts, modify group memberships, access executive data |
+
+**Implementing Least Privilege:**
+
+1. **Start with zero access:** New users start with no permissions
+2. **Grant only what is needed:** Add permissions based on job function
+3. **Use roles, not individual permissions:** Define standard roles (e.g., "Marketing User", "DBA") with appropriate permissions
+4. **Regular review:** Periodically audit permissions and remove unnecessary access
+5. **Temporary elevation:** Use just-in-time access for rare elevated tasks
+6. **Monitor and alert:** Flag unusual access patterns that suggest over-permission
+
+**What happens WITHOUT Least Privilege:**
+
+Consider a company where all employees have local administrator rights on their laptops:
+- A marketing employee accidentally installs malware that encrypts all files
+- Because they have admin rights, the malware can:
+  - Disable antivirus
+  - Install keyloggers
+  - Access all files on the machine (including cached credentials)
+  - Spread to network shares
+  - Modify system configurations
+
+With least privilege (standard user rights):
+- The malware cannot install system-wide
+- Cannot disable security tools
+- Cannot access protected system areas
+- Damage is contained to the user's own files
+
+**Least Privilege is not just for users:**
+- **Applications:** A web application should only have database read permissions for the tables it needs
+- **Services:** A backup service should only have backup permissions, not delete permissions
+- **APIs:** An API key should only have access to the specific endpoints required
+- **Containers:** Containers should run with minimal capabilities and file system access
+
+### Separation of Duties (SoD)
+
+**Separation of Duties** is the principle that no single individual should have complete control over a critical process. Responsibilities are divided among multiple people to prevent fraud, errors, and abuse.
+
+**Why SoD matters:**
+- **Fraud prevention:** One person cannot both create a fake vendor AND pay that vendor
+- **Error detection:** One person enters data, another verifies it
+- **Insider threat mitigation:** No single person can cause catastrophic damage alone
+- **Compliance:** SOX, PCI-DSS, and many frameworks require SoD
+
+**How SoD works:**
+
+A critical business process is broken into distinct steps, and different people perform each step:
+
+**Example: Purchasing Process**
+
+| Step | Action | Role | Why Separation Matters |
+|------|--------|------|----------------------|
+| 1 | Create purchase requisition | Department Employee | Initiates the need |
+| 2 | Approve requisition | Department Manager | Verifies the need is legitimate and within budget |
+| 3 | Issue purchase order | Procurement Officer | Formalizes the purchase; separate from approval |
+| 4 | Receive goods | Receiving Clerk | Confirms goods arrived; separate from ordering |
+| 5 | Verify invoice | Accounts Payable Clerk | Confirms invoice matches PO and receipt |
+| 6 | Process payment | Payment Authorizer | Releases funds; highest risk step |
+
+**If one person could do steps 1, 2, 3, and 6:** They could create a fake vendor, approve their own purchase, and pay themselves.
+
+**Example: Software Development**
+
+| Step | Action | Role | Why Separation Matters |
+|------|--------|------|----------------------|
+| 1 | Write code | Developer | Creates functionality |
+| 2 | Review code | Peer Developer | Catches bugs, security issues, backdoors |
+| 3 | Approve merge | Tech Lead | Authorizes code into main branch |
+| 4 | Deploy to production | DevOps Engineer | Separate from code authorship |
+| 5 | Verify deployment | QA Engineer | Confirms deployment works correctly |
+
+**If one person could write, review, approve, and deploy:** They could introduce malicious code with no oversight.
+
+**SoD in IAM Systems:**
+
+IAM systems enforce SoD technically:
+
+| Conflict | Role A | Role B | Risk |
+|----------|--------|--------|------|
+| Create user + Approve user | User Administrator | User Approval Manager | Create backdoor accounts |
+| Grant access + Audit access | Access Administrator | Security Auditor | Grant unauthorized access; hide evidence |
+| Request privilege + Approve privilege | Standard User | Privilege Approver | Self-approve elevated access |
+| Backup data + Delete data | Backup Operator | Data Administrator | Delete data; restore to cover tracks |
+
+**SoD enforcement approaches:**
+- **Preventive:** System physically prevents conflicting role assignment ("You cannot have both roles")
+- **Detective:** System flags existing conflicts for review ("Alert: User has conflicting roles")
+- **Compensating:** When technical SoD is impossible (small teams), manual reviews or supervisor oversight compensate
+
+### Core IAM Components
+
+IAM systems consist of integrated components working together:
+
+| Component | Function | Real-World Analogy |
+|-----------|----------|-------------------|
+| **Identity Store (Directory)** | Central repository of all identities and attributes | The employee database with names, departments, roles |
+| **Authentication Service** | Verifies identity through credentials | The security guard checking your badge and face |
+| **Authorization Engine** | Determines permissions based on policies | The access control system deciding which doors your badge opens |
+| **Policy Store** | Stores access rules and policies | The building's access rulebook |
+| **Audit & Logging** | Records all access events for review | Security camera footage and access logs |
+| **Provisioning Service** | Creates, modifies, and removes accounts | HR onboarding/offboarding process |
 
 ### The CIA Triad and IAM
 
 IAM directly supports the three pillars of information security:
 
-| Pillar | Definition | IAM Contribution |
-|--------|-----------|-----------------|
-| **Confidentiality** | Ensuring information is accessible only to authorized parties | Authentication prevents unauthorized access; authorization enforces need-to-know |
-| **Integrity** | Ensuring information is accurate and unaltered | Audit logs detect unauthorized changes; SoD prevents single-actor tampering |
-| **Availability** | Ensuring information is accessible when needed | Proper provisioning ensures legitimate users can work; access reviews prevent lockouts |
-
-### Core Security Principles
-
-**Principle of Least Privilege (PoLP)**
-> Every identity should have the minimum access necessary to perform its function — no more, no less.
-
-**Implementation:**
-- Start with zero permissions
-- Add only what is explicitly needed
-- Review and revoke unused permissions regularly
-- Use time-bound access for temporary needs
-
-**Why it fails in practice:** Convenience often overrides security. Administrators grant broad permissions to avoid ticket volume. Developers use admin accounts for daily work. Role definitions become bloated over time.
-
-**Separation of Duties (SoD)**
-> Critical actions should require multiple people to complete, preventing any single individual from abusing privileges.
-
-**Implementation:**
-- The person who requests a purchase cannot approve it
-- The developer who writes code cannot deploy it to production without review
-- The database administrator who backs up data cannot also delete audit logs
-- The person who creates user accounts cannot also assign admin privileges
-
-**Types of SoD:**
-- **Static SoD:** Mutually exclusive roles cannot be assigned to the same user
-- **Dynamic SoD:** Mutually exclusive roles cannot be activated in the same session
-- **Preventive SoD:** System blocks the conflicting assignment
-- **Detective SoD:** System flags the conflict for remediation
+| CIA Pillar | IAM Contribution | Example |
+|-----------|------------------|---------|
+| **Confidentiality** | Ensures only authorized users access sensitive data | Restricting financial records to Finance team |
+| **Integrity** | Prevents unauthorized modification of data | Allowing only DBAs to modify database schemas |
+| **Availability** | Ensures legitimate users can access resources when needed | Quick provisioning for new hires; self-service password reset |
 
 ---
 
-## How It Works
+## User Lifecycle Management (ULM): Joiner, Mover, Leaver (JML)
 
-### Directory Services: The Identity Database
+**User Lifecycle Management (ULM)** is the standard industry framework for managing identities throughout their organizational existence. The JML model — **Joiner, Mover, Leaver** — describes the three primary lifecycle states.
 
-Behind every IAM system is a **directory service** — a specialized database optimized for fast reads of user information.
+This framework ensures that access is granted appropriately when people join, adjusted correctly when their role changes, and revoked completely when they leave.
 
-**LDAP (Lightweight Directory Access Protocol)** is the most widely adopted standard. Directories store data hierarchically:
+### 1. JOINER (Onboarding)
 
+**When:** A new person starts — employee, contractor, partner, intern, vendor.
+
+**What must happen:**
+
+| Step | Action | Why Critical |
+|------|--------|-------------|
+| **Identity Creation** | Create unique digital identity (username, email, employee ID) | Foundation for all subsequent access |
+| **Attribute Assignment** | Assign department, manager, job title, location | Determines what access is needed |
+| **Credential Provisioning** | Set initial password, issue MFA token, create certificates | Enables authentication |
+| **Role Assignment** | Assign roles based on job function | Determines authorization |
+| **Access Provisioning** | Grant access to applications, systems, files needed for the role | Enables productivity; must follow least privilege |
+| **Notification** | Inform manager, IT team, security team | Ensures accountability and oversight |
+| **Training Assignment** | Assign security awareness training, policy acknowledgments | Reduces human risk |
+
+**Joiner risks if poorly managed:**
+- Delayed access = employee cannot work
+- Excessive access = violation of least privilege from day one
+- Missing access = employee finds workarounds (shadow IT)
+- Orphaned pre-provisioned accounts = security gap
+
+### 2. MOVER (Transfer / Change)
+
+**When:** A person's role, department, location, or responsibilities change — promotion, lateral move, department transfer, temporary assignment.
+
+**What must happen:**
+
+| Step | Action | Why Critical |
+|------|--------|-------------|
+| **Old Access Review** | Document current access rights | Baseline for changes |
+| **Remove Old Access** | Revoke permissions from previous role | Prevents access creep |
+| **Add New Access** | Grant permissions for new role | Enables new responsibilities |
+| **Attribute Update** | Update department, manager, job title, location | Ensures accurate identity data |
+| **Notify Stakeholders** | Inform old manager, new manager, security team | Maintains accountability |
+| **Compliance Check** | Verify no SoD conflicts with new role combinations | Prevents policy violations |
+
+**Mover risks if poorly managed:**
+- **Access creep:** User accumulates permissions from multiple roles (old + new)
+- **SoD violations:** New role combination creates a conflict
+- **Missing access:** Cannot perform new job functions
+- **Stale data:** Old department/manager attributes cause wrong routing
+
+**Access Creep is the silent killer of IAM:**
+
+Consider an employee's journey:
+- Year 1: Hired as Marketing Coordinator → gets marketing folder access
+- Year 2: Transferred to Sales → keeps marketing access + gets CRM access
+- Year 3: Promoted to Sales Manager → keeps all prior access + gets approval rights
+- Year 4: Temporary IT project → gets admin access (never revoked)
+
+By year 5, this employee has access to Marketing, Sales, CRM, and IT systems. If their account is compromised, the attacker has broad access. If they become malicious, they can access data across departments.
+
+**The solution:** Mover processes must systematically REMOVE old access while adding new access.
+
+### 3. LEAVER (Offboarding)
+
+**When:** A person leaves the organization — resignation, termination, retirement, contract end, leave of absence.
+
+**What must happen:**
+
+| Step | Action | Why Critical |
+|------|--------|-------------|
+| **Account Disablement** | Disable account immediately upon notification | Prevents further access |
+| **Access Revocation** | Revoke all system, application, and resource access | Removes authorization |
+| **Credential Invalidation** | Disable passwords, tokens, certificates, API keys | Prevents authentication |
+| **Session Termination** | Kill all active sessions across all systems | Stops ongoing access |
+| **Asset Recovery** | Collect company devices, badges, tokens | Physical security |
+| **Data Transfer** | Transfer ownership of files, emails, documents | Business continuity |
+| **Archive Identity** | Retain identity record with termination reason | Audit trail, compliance |
+| **Notify Stakeholders** | Inform manager, IT, security, compliance | Coordinated response |
+
+**Leaver risks if poorly managed:**
+- **Orphaned accounts:** Account remains active after departure
+- **Ghost access:** Former employee can still log in weeks or months later
+- **Session persistence:** Active sessions continue after account disablement
+- **Data exfiltration:** Departing employee copies data before leaving
+- **Revenge actions:** Terminated employee damages systems or data
+
+**Critical timing:** For involuntary terminations, disablement must happen **BEFORE** the employee is notified, to prevent retaliation.
+
+### JML Automation
+
+Modern IAM systems automate JML workflows:
+
+**Joiner automation:**
 ```
-dc=company,dc=com                    [Root: the domain]
-├── ou=Users                         [Organizational Unit: all users]
-│   ├── uid=jdoe                     [User entry]
-│   │   ├── cn: John Doe             [Common Name: display name]
-│   │   ├── mail: jdoe@company.com   [Email address]
-│   │   ├── userPassword: {SSHA}...  [Password hash — NEVER plaintext]
-│   │   ├── title: Senior Developer  [Job title]
-│   │   └── department: Engineering  [Department]
-│   └── uid=asmith
-├── ou=Groups                        [Organizational Unit: all groups]
-│   ├── cn=Engineering               [Group entry]
-│   │   └── member: uid=jdoe         [Group members]
-│   └── cn=Finance
-└── ou=ServiceAccounts               [Service accounts]
-    └── cn=backup-service
-```
-
-**Key LDAP terms:**
-- **DN (Distinguished Name):** Unique identifier for every entry. Example: `uid=jdoe,ou=Users,dc=company,dc=com`
-- **RDN (Relative Distinguished Name):** The individual component. Example: `uid=jdoe`
-- **OU (Organizational Unit):** Container for grouping entries
-- **DC (Domain Component):** Part of the DNS domain name
-- **CN (Common Name):** Display name or object name
-- **Attribute:** A property of an entry (mail, title, telephoneNumber)
-- **ObjectClass:** Schema definition for what attributes an entry can have
-
-**How a login actually works behind the scenes:**
-1. User submits username and password to the application
-2. Application formats the username as a DN (or searches for it)
-3. Application sends a **bind** request to the directory with the DN and password
-4. Directory retrieves the stored password hash for that DN
-5. Directory hashes the submitted password using the same algorithm and salt
-6. Directory compares the hashes (never compares plaintext passwords)
-7. If they match, bind succeeds; if not, `InvalidCredentials` is returned
-8. On successful bind, the application searches for the user's group memberships
-9. The application resolves permissions based on group memberships
-10. The application creates a session and issues a token
-
-**Why directories use specialized databases:**
-- Optimized for read-heavy workloads (thousands of lookups per minute)
-- Hierarchical structure maps naturally to organizational charts
-- Standardized protocol (LDAP) allows any application to query
-- Replication ensures availability across multiple servers
-
-### Session Tokens and Cookies
-
-After successful authentication, the system does not ask for your password on every click. Instead, it issues a **session token**.
-
-**How session management works:**
-1. After successful authentication, the server generates a cryptographically random token (e.g., 128 bits of entropy)
-2. The server stores the token in a session database with: user ID, creation time, expiration time, IP address, user agent
-3. The server sends the token to the browser in a **cookie**
-4. The browser automatically includes this cookie in every subsequent request
-5. The server looks up the token, validates it (not expired, not revoked), and identifies the user
-
-**Session security measures:**
-- **Short expiration:** Sessions expire after 15-60 minutes of inactivity
-- **HttpOnly flag:** Cookie cannot be accessed by JavaScript (prevents XSS theft)
-- **Secure flag:** Cookie is only sent over HTTPS
-- **SameSite attribute:** Cookie is not sent in cross-site requests (prevents CSRF)
-- **Rotation:** Session ID changes on privilege escalation or sensitive actions
-- **Invalidation:** Server can immediately revoke sessions (on logout, password change, or security incident)
-
-**Token-based alternatives (JWT):**
-- Instead of server-side session storage, some systems use JSON Web Tokens
-- JWT contains user identity and claims, cryptographically signed by the server
-- Server verifies the signature instead of looking up a database
-- Trade-off: JWTs cannot be easily revoked before expiration
-
-### Audit Logs: The Security Camera
-
-Every IAM system must log actions for compliance and forensics. A comprehensive audit log entry contains:
-
-```json
-{
-  "timestamp": "2024-01-15T14:32:18Z",
-  "event_type": "AUTHENTICATION",
-  "event_subtype": "LOGIN_SUCCESS",
-  "user_id": "jdoe",
-  "user_type": "human",
-  "source_ip": "192.168.1.45",
-  "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-  "authentication_method": "password+mfa",
-  "mfa_type": "totp",
-  "session_id": "sess_a3f7b2d9e8c1",
-  "application": "corporate-portal",
-  "resource": "N/A",
-  "action": "N/A",
-  "result": "SUCCESS",
-  "risk_score": 15,
-  "device_id": "device_abc123",
-  "location": "New York, USA",
-  "correlation_id": "req_789xyz"
-}
+HR System (new hire recorded)
+    ↓
+IAM System (identity created, attributes populated)
+    ↓
+Provisioning Engine (access granted based on role rules)
+    ↓
+Notification Sent (manager informed, user receives welcome email)
 ```
 
-**What security analysts look for in logs:**
-- Failed login attempts followed by success (possible brute force)
-- Logins from impossible locations (same user in NYC and Tokyo within minutes)
-- After-hours admin activity
-- MFA disable requests
-- New device registrations for privileged accounts
-- Bulk permission changes
-- Access to sensitive resources by unusual users
+**Mover automation:**
+```
+HR System (transfer recorded)
+    ↓
+IAM System (attributes updated)
+    ↓
+Access Review (current access catalogued)
+    ↓
+Old Access Revoked + New Access Granted
+    ↓
+SoD Check (verify no policy violations)
+```
+
+**Leaver automation:**
+```
+HR System (termination recorded)
+    ↓
+IAM System (account disabled IMMEDIATELY)
+    ↓
+Provisioning Engine (all access revoked)
+    ↓
+Session Manager (all sessions terminated)
+    ↓
+Audit Log (complete record preserved)
+```
 
 ---
 
-## Where You See It
+## How IAM Systems Work
 
-| Product / Standard | Role in IAM | What You Interact With |
-|-------------------|-------------|----------------------|
-| **Active Directory** | Directory + authentication | Windows login, Group Policy, file shares |
-| **Azure AD / Entra ID** | Cloud identity provider | Microsoft 365 login, SSO to SaaS apps |
-| **Okta** | Cloud IAM platform | SSO dashboard, MFA prompts, lifecycle management |
-| **AWS IAM** | Cloud resource authorization | IAM policies, roles, service accounts |
-| **Linux PAM** | Authentication framework | sudo, login, password changes |
-| **NIST SP 800-63** | Federal identity guidelines | Defines AAL (Authenticator Assurance Levels) |
-| **ISO 27001** | Security management standard | Requires access control and audit procedures |
+### The Access Request Flow
+
+When a user attempts to access a resource, the IAM system performs a sequence of operations:
+
+```
+User requests access to Resource X
+           │
+           ▼
+    ┌─────────────┐
+    │  Step 1:    │
+    │ Authentication│
+    │ "Who are you?"│
+    └──────┬──────┘
+           │
+    ┌──────▼──────┐
+    │ Verify      │
+    │ credentials │
+    │ (password,  │
+    │ MFA, cert)  │
+    └──────┬──────┘
+           │
+    ┌──────▼──────┐
+    │  Step 2:    │
+    │ Authorization│
+    │ "What can you│
+    │  do?"       │
+    └──────┬──────┘
+           │
+    ┌──────▼──────┐
+    │ Evaluate    │
+    │ policies    │
+    │ against     │
+    │ identity and│
+    │ context     │
+    └──────┬──────┘
+           │
+    ┌──────▼──────┐
+    │  Step 3:    │
+    │   Decision   │
+    │ Allow / Deny │
+    │ / Step-up    │
+    └──────┬──────┘
+           │
+    ┌──────▼──────┐
+    │  Step 4:    │
+    │   Logging    │
+    │ Record for   │
+    │ audit        │
+    └─────────────┘
+```
+
+### Authentication Flow Deep Dive
+
+**Password-based authentication:**
+```
+1. User enters username and password
+2. System looks up user's stored password hash
+3. System hashes the entered password using the same algorithm
+4. System compares the two hashes
+5. If they match → authentication succeeds
+6. If they don't match → authentication fails
+```
+
+**Why passwords are stored as hashes, not plaintext:**
+- If the database is breached, attackers get hashes, not actual passwords
+- Hashing is one-way: you cannot reverse a hash to get the password
+- Each user should have a unique salt so identical passwords produce different hashes
+- Modern algorithms (bcrypt, Argon2) are intentionally slow to resist brute force
+
+---
+
+## Where You See IAM
+
+| Product/Service | IAM Function | Use Case |
+|----------------|-------------|----------|
+| **Active Directory / Azure AD** | Directory, authentication, group policy | Enterprise Windows domain authentication |
+| **Okta** | Cloud identity, SSO, MFA | Workforce identity and SaaS application access |
+| **AWS IAM** | Cloud resource access control | Managing who can access AWS services |
+| **Google Workspace** | Identity, email, document access | Corporate email and collaboration |
+| **CyberArk** | Privileged access management | Securing admin and service accounts |
+| **SailPoint** | Identity governance | Access certification and compliance |
+| **Duo / Microsoft Authenticator** | Multi-factor authentication | Adding second factor to logins |
+| **Linux PAM** | Pluggable authentication | Unix/Linux system authentication |
 
 ---
 
@@ -312,75 +453,93 @@ Every IAM system must log actions for compliance and forensics. A comprehensive 
 
 | Misconception | Reality |
 |--------------|---------|
-| "IAM is just about passwords" | IAM covers the complete lifecycle: creation, authentication, authorization, monitoring, and removal. Passwords are just one authentication method. |
-| "Authentication and authorization are the same thing" | Authentication proves identity. Authorization decides permissions. They are completely separate steps handled by different systems. |
-| "Small companies don't need formal IAM" | Even a 5-person team needs to revoke access when someone leaves, review permissions quarterly, and protect admin accounts. |
-| "IAM is only the IT department's responsibility" | HR triggers provisioning and deprovisioning. Legal requires audit trails. Compliance mandates access reviews. Managers certify their team's access. |
-| "Cloud IAM is completely different from on-prem IAM" | The principles are identical. The implementation differs (APIs vs. GUIs, ephemeral resources vs. static servers), but the concepts translate directly. |
-| "Service accounts don't need governance" | Machine identities often outnumber human identities and are frequently over-permissioned. They require the same governance as human accounts. |
+| "IAM is just about passwords" | IAM encompasses identity lifecycle, authentication, authorization, governance, audit, and privilege management. Passwords are one small piece. |
+| "Authentication and authorization are the same thing" | Authentication proves identity. Authorization determines permissions. You need both. |
+| "Least privilege slows down work" | Properly implemented least privilege through roles and automation enables quick, appropriate access while preventing misuse. |
+| "SoD only matters in finance" | SoD applies to any process where one person could cause harm: code deployment, data management, system administration. |
+| "Once authenticated, you're trusted forever" | Good IAM systems re-evaluate trust continuously: session timeouts, step-up authentication, risk-based re-verification. |
+| "IAM is an IT problem, not a business problem" | IAM decisions require business input: who needs what access, what are the risks, what is the compliance requirement. |
 
 ---
 
 ## How to Practice
 
-### Exercise 1: Map Your Organization's IAM Lifecycle
-Pick an organization you know (your workplace, university, or a hypothetical company) and map:
-- How does a new person get access? How long does it take?
-- Who decides what they can access?
-- How is access reviewed? How often?
-- How is access removed when someone leaves? How quickly?
-- Where are the gaps or risks?
+### Exercise 1: Authentication vs Authorization
+For each scenario, identify whether it is authentication or authorization:
+1. A user enters a username and password
+2. The system checks if the user is in the "Managers" group
+3. A fingerprint scan unlocks a smartphone
+4. The application denies access to an admin page
+5. An API key is validated against a database
+6. The system checks if the user owns the document they are trying to edit
 
-### Exercise 2: Read Real Audit Logs
-If you have access to any system logs:
-- Locate authentication events (Windows Event Log, Linux auth.log, application logs)
-- Identify: timestamp, user, IP address, action, result
-- Look for patterns: repeated failures, after-hours access, new locations
-- Write a one-page summary of what a security analyst would look for
+### Exercise 2: Apply Least Privilege
+A new employee joins as a Junior Accountant. List:
+1. What systems and data they NEED access to
+2. What systems and data they should NOT have access to
+3. What temporary access they might need occasionally (and how to handle it)
 
-### Exercise 3: Simulate the Lifecycle
-Run the projects below to see the full lifecycle in action:
+### Exercise 3: Identify SoD Conflicts
+For each pair of permissions, determine if they create a separation of duties conflict:
+1. Create purchase order + Approve purchase order
+2. Read financial reports + Read marketing materials
+3. Deploy code to production + Review code changes
+4. Create user accounts + Reset user passwords
+5. Approve invoices + Process payments
+6. Read customer data + Read employee data
+
+### Exercise 4: Map a JML Lifecycle
+Document the complete JML lifecycle for one role in your organization or a hypothetical company:
+- JOINER: What access is provisioned on day 1?
+- MOVER: What happens when promoted or transferred?
+- LEAVER: What is revoked and when?
+- Identify any gaps in the current process
+
+### Exercise 5: Run the Simulations
+- `identity_lifecycle_sim.py` — Simulates JML processes
+- `iam_maturity_assessment.py` — Evaluates IAM program maturity
+- `iam_concept_matcher.py` — Tests knowledge of IAM terminology
 
 ---
 
 ## Projects
 
 ### `identity_lifecycle_sim.py`
-Simulates the complete IAM lifecycle for an organization:
-- Onboards new employees with role-based provisioning
-- Simulates role changes and promotions
-- Handles offboarding with complete access revocation
-- Generates compliance audit reports
-
-**Run:** `python "1. Introduction to IAM/projects/identity_lifecycle_sim.py"`
+Simulates the complete JML lifecycle:
+- Joiner: Identity creation, attribute assignment, role provisioning
+- Mover: Access review, old access revocation, new access granting, SoD checking
+- Leaver: Immediate disablement, access revocation, session termination, archiving
+- Demonstrates access creep when mover processes fail
+- Generates audit trail for compliance
 
 ### `iam_maturity_assessment.py`
-Interactive assessment evaluating an organization's IAM maturity across:
-- Identity governance and lifecycle management
-- Access management and authorization
+Evaluates organizational IAM maturity across dimensions:
+- Identity lifecycle management
 - Authentication strength
-- Monitoring and analytics
-
-Provides maturity scores and actionable recommendations.
-
-**Run:** `python "1. Introduction to IAM/projects/iam_maturity_assessment.py"`
+- Authorization model
+- Privileged access management
+- Governance and compliance
+- Provides maturity score and improvement recommendations
 
 ### `iam_concept_matcher.py`
-Interactive quiz that tests whether you can match real-world scenarios to the correct IAM concept (authentication, authorization, provisioning, etc.).
-
-**Run:** `python "1. Introduction to IAM/projects/iam_concept_matcher.py"`
+Interactive quiz covering:
+- Authentication vs authorization scenarios
+- Least privilege application
+- SoD conflict identification
+- JML process stages
+- IAM component matching
 
 ---
 
 ## Check Your Understanding
 
-1. Describe the five stages of the IAM lifecycle. For each stage, identify one common failure and its security impact.
-2. Explain the difference between authentication and authorization. Give a real-world example where authentication succeeds but authorization fails.
-3. What is the Principle of Least Privilege? Describe three ways it commonly fails in practice.
-4. Compare and contrast Static SoD and Dynamic SoD. When would you use each?
-5. What information does a comprehensive audit log capture? Explain why each field is important for security or compliance.
-6. Name three types of identities and explain which is often the most overlooked in security programs. Why?
-7. Describe the LDAP authentication process step by step, from username submission to session creation.
-8. Why are session tokens used instead of asking for passwords on every request? What security measures protect session tokens?
-9. What is the difference between an IAM Administrator and an IAM Analyst? Which role would be responsible for running quarterly access reviews?
-10. Describe how an IAM Consultant differs from an IAM Developer in terms of responsibilities, skills, and deliverables.
+1. What is the difference between Authentication and Authorization? Give three real-world examples where both occur in sequence.
+2. Explain the Principle of Least Privilege in your own words. Why is it a foundational security principle? What happens when it is ignored?
+3. What is Separation of Duties? Give three examples from different domains (finance, software development, system administration) and explain the risk each prevents.
+4. Describe the Joiner-Mover-Leaver (JML) lifecycle. What specific actions must occur at each stage? What are the risks if any stage is poorly executed?
+5. What is access creep? How does it happen during the Mover stage? What process prevents it?
+6. Why must leaver offboarding disable accounts BEFORE the employee is notified of termination? Describe a scenario where this timing matters.
+7. Compare preventive, detective, and compensating SoD controls. When would you use each?
+8. A new developer starts and is given full production database access "just in case." Identify all the problems with this decision using IAM principles.
+9. How does the CIA Triad relate to IAM? Give one IAM example for each pillar (Confidentiality, Integrity, Availability).
+10. Design an IAM onboarding process for a hospital: a new nurse needs access to patient records, scheduling systems, and the medication administration system. What access should be granted immediately, what should require approval, and what should be denied?
