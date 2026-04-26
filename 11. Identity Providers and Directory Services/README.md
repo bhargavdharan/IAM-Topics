@@ -304,6 +304,62 @@ Simulates cross-directory synchronization:
 
 ---
 
+## Directory Services in Practice: COTS Products and Deployment
+
+### Directory COTS Products
+
+| Product | Type | Best For | Deployment Model |
+|---------|------|----------|-----------------|
+| **Active Directory Domain Services** | On-premises directory | Windows-centric organizations | On-premises servers (Domain Controllers) |
+| **Azure Active Directory (Entra ID)** | Cloud directory | Microsoft 365 users; hybrid organizations | Cloud-hosted; no servers to manage |
+| **Azure AD Connect** | Sync tool | Organizations with on-prem AD + cloud | Software installed on on-prem server |
+| **OpenLDAP** | Open-source directory | Linux environments; cost-constrained | Self-hosted; community supported |
+| **FreeIPA** | Open-source IdP + Directory | Linux enterprise identity | Self-hosted; Red Hat backed |
+| **Okta Universal Directory** | Cloud directory | Multi-platform; SaaS-heavy organizations | Cloud-hosted; managed by Okta |
+| **PingDirectory** | Enterprise directory | Large organizations; high availability | On-premises or cloud; vendor supported |
+| **Google Cloud Identity** | Cloud directory | Google Workspace organizations | Cloud-hosted; managed by Google |
+
+### AD Deployment vs Ongoing Administration
+
+**New Active Directory deployment project (Implementation):**
+- Design forest/domain structure
+- Install first Domain Controller
+- Create OU hierarchy
+- Configure DNS integration
+- Set up Group Policy baseline
+- Configure replication between sites
+- Integrate with Azure AD Connect (if hybrid)
+- Test authentication and replication
+- Document and hand over to Support
+
+**Ongoing AD administration (Support):**
+- Create/disable user accounts
+- Manage group memberships
+- Troubleshoot replication issues
+- Respond to Group Policy problems
+- Handle password resets and lockouts
+- Monitor DC health and performance
+- Apply patches and updates
+- Respond to audit requests
+
+**Skills difference:**
+- **Implementation** requires architecture design, network planning, and project execution
+- **Support** requires troubleshooting, log analysis, and user assistance
+- Both require deep Active Directory knowledge, but applied differently
+
+**Hybrid identity implementation reality:**
+Most enterprises already have on-premises AD. The implementation project is typically:
+1. Install Azure AD Connect on a server
+2. Configure sync rules (which OUs to sync, which attributes)
+3. Choose authentication method (PHS, PTA, or Federation)
+4. Test with pilot group
+5. Roll out to all users
+6. Configure SSO for SaaS applications
+7. Implement Conditional Access policies
+8. Hand over to ongoing administration
+
+---
+
 ## Check Your Understanding
 
 1. What is the difference between a directory service and an identity provider? How do they work together?

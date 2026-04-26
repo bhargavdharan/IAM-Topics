@@ -287,6 +287,50 @@ Analyzes logs for unauthorized privilege escalation:
 
 ---
 
+## PAM in Practice: COTS Products and Career Roles
+
+### PAM COTS Products and What They Do
+
+Organizations do not build PAM solutions from scratch. They buy specialized products:
+
+| Product | Type | Best For | Key Differentiator |
+|---------|------|----------|-------------------|
+| **CyberArk** | Enterprise PAM | Large organizations; strict compliance | Most comprehensive; highest security certifications; expensive |
+| **Delinea (formerly Thycotic)** | Enterprise PAM | Mid-to-large organizations | Strong Windows integration; easier deployment than CyberArk |
+| **BeyondTrust** | PAM + Remote Access | Organizations with many vendors/contractors | Strong privileged remote access; session management |
+| **HashiCorp Vault** | Secrets Management | Cloud-native; DevOps environments | Dynamic secrets; API-first; developer-friendly |
+| **Microsoft Privileged Identity Management (PIM)** | Cloud PAM | Microsoft-heavy environments | Native Azure AD integration; no extra licensing for E5 customers |
+| **AWS Secrets Manager** | Cloud Secrets | AWS-centric organizations | Automatic rotation; tight AWS service integration |
+| **Linux sudo + LAPS** | Built-in OS | Small-to-mid organizations; cost-constrained | Free; built into operating systems; limited features |
+
+**Product selection reality:**
+- A 50-person startup uses **sudo + password manager** — no budget for CyberArk
+- A 5,000-person bank uses **CyberArk** — regulatory requirements demand it
+- A cloud-native company uses **HashiCorp Vault** — developers need API access to secrets
+- A Microsoft shop uses **Azure AD PIM** — already paying for E5 licenses
+
+### PAM Support vs Implementation
+
+| Aspect | PAM Support | PAM Implementation |
+|--------|------------|-------------------|
+| **Daily work** | Unlock vault access, troubleshoot session recording, investigate failed logins, rotate passwords on demand | Deploy vault infrastructure, configure safes/folders, integrate with AD, set up session recording, design JIT workflows |
+| **Skills needed** | Product-specific admin (CyberArk PVWA, Delinea Secret Server), Active Directory, scripting for automation | Product architecture, AD/LDAP integration, API development, policy design, project management |
+| **Tools** | Vault admin console, session replay, audit logs | Installation media, configuration wizards, API documentation, test plans |
+| **Typical ticket** | "I cannot access the production database vault" | "Deploy PAM for 500 administrators across 3 data centers" |
+
+**Implementation project example:**
+A hospital implements CyberArk for HIPAA compliance:
+- **Phase 1 (2 weeks):** Install vault servers, configure high availability
+- **Phase 2 (4 weeks):** Integrate with Active Directory, import existing admin accounts
+- **Phase 3 (6 weeks):** Configure safes (folders) for each system type, set access policies
+- **Phase 4 (4 weeks):** Deploy session recording agents to jump servers
+- **Phase 5 (4 weeks):** Configure automatic password rotation for service accounts
+- **Phase 6 (ongoing):** Train administrators, hand over to Support team
+
+**Total: 20 weeks for initial deployment + ongoing support**
+
+---
+
 ## Check Your Understanding
 
 1. Why are privileged accounts the most valuable targets for attackers? Describe three specific risks of privileged account compromise.

@@ -327,6 +327,57 @@ Discovers optimal roles from access data:
 
 ---
 
+## IGA in Practice: COTS Products and Operations
+
+### IGA COTS Products
+
+| Product | Type | Best For | Key Differentiator |
+|---------|------|----------|-------------------|
+| **SailPoint IdentityNow** | Enterprise IGA (cloud) | Large organizations; complex compliance | Market leader; most comprehensive; expensive |
+| **SailPoint IdentityIQ** | Enterprise IGA (on-prem) | Organizations requiring on-premises | Same features as IdentityNow; self-hosted |
+| **Microsoft Entitlement Management** | Cloud IGA | Microsoft-heavy environments | Included with Azure AD P2; good for mid-market |
+| **Okta Identity Governance** | Cloud IGA | Okta customers; cloud-native | Integrated with Okta Workforce; simpler than SailPoint |
+| **Saviynt** | Cloud-native IGA | Cloud-first organizations | Modern UI; strong analytics; faster deployment |
+| **Oracle Identity Governance** | Enterprise IGA | Oracle ecosystem customers | Deep Oracle integration; complex; powerful |
+| **One Identity** | Unified IAM/IGA | Organizations wanting one vendor | Combines access management with governance |
+
+### IGA Implementation vs Ongoing Operations
+
+**IGA Implementation project (typically 6-12 months):**
+- Connect to all target systems (AD, SAP, Salesforce, etc.)
+- Configure connectors and provisioning rules
+- Import existing users and entitlements
+- Design role model (role mining)
+- Configure access request workflows
+- Set up SoD policies
+- Configure certification campaigns
+- Build reports and dashboards
+- Train administrators and managers
+
+**IGA Ongoing Operations (Support/Analyst):**
+- Run quarterly access certification campaigns
+- Review and approve access requests
+- Investigate SoD violations
+- Generate audit reports
+- Update roles as organization changes
+- Troubleshoot connector failures
+- Handle user complaints about access
+
+**The IGA analyst career path:**
+Unlike Support (tickets) or Implementation (projects), IGA Analysts live in the **ongoing governance cycle**. Their work is cyclical — certification reviews happen quarterly, access requests happen daily, audit preparation happens annually.
+
+**Implementation vs Operations skill difference:**
+
+| Skill | Implementation | Operations |
+|-------|---------------|------------|
+| **Connector development** | High — build integrations | Low — troubleshoot existing |
+| **Role modeling** | High — design from scratch | Medium — refine over time |
+| **Policy configuration** | High — initial setup | Medium — adjust as needed |
+| **Audit response** | Low | High — primary responsibility |
+| **Reporting** | Medium — build dashboards | High — run and interpret |
+
+---
+
 ## Check Your Understanding
 
 1. What is the difference between IAM and IGA? Why do organizations need both?

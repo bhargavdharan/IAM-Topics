@@ -28,6 +28,26 @@ This platform covers 15 IAM topics in depth:
 
 ---
 
+## Common COTS IAM Products in Industry
+
+Organizations rarely build IAM from scratch. They buy **Commercial Off-The-Shelf (COTS)** products and configure them. Here are the products you will actually work with:
+
+| IAM Function | Leading COTS Products | What They Do |
+|-------------|----------------------|-------------|
+| **Identity Provider (IdP)** | Okta, Azure AD, Ping Identity, ForgeRock, Auth0 | Authenticate users; issue tokens; manage profiles |
+| **Directory Services** | Active Directory, Azure AD, OpenLDAP, FreeIPA | Store and organize identity data |
+| **Single Sign-On (SSO)** | Okta, Azure AD, PingFederate, IBM Security Verify | One-login access to multiple applications |
+| **Multi-Factor Authentication** | Duo, Microsoft Authenticator, RSA SecurID, YubiKey | Second-factor verification |
+| **Privileged Access Management** | CyberArk, Delinea (Thycotic), BeyondTrust, HashiCorp Vault | Vault credentials; control admin access |
+| **Identity Governance** | SailPoint, Saviynt, Oracle Identity Governance | Access reviews; certifications; SoD |
+| **Customer Identity (CIAM)** | Auth0, Okta Customer Identity, PingOne, Amazon Cognito | Customer registration, login, preferences |
+| **Cloud IAM** | AWS IAM, Azure RBAC, Google Cloud IAM | Control access to cloud resources |
+| **Password Management** | 1Password Business, LastPass Enterprise, Bitwarden | Team password storage and sharing |
+
+**Trend:** Major vendors are becoming suites. Okta now covers IdP + SSO + MFA + Governance. Microsoft offers Azure AD + PIM + Conditional Access + Entitlement Management. Organizations increasingly buy suites rather than best-of-breed point solutions.
+
+---
+
 ## IAM Career Roles, Responsibilities, and Implementation Reality
 
 Identity and Access Management offers multiple career paths. Understanding the differences — and how IAM actually works in industry — helps you target your skill development effectively.
