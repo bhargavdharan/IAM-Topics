@@ -89,6 +89,27 @@ In MAC, **system-enforced policies based on security labels control access**. Us
 - Bell-LaPadula confidentiality model
 - Compartmented security systems
 
+**The Bell-LaPadula Model (Confidentiality):**
+
+The Bell-LaPadula model is the classic formal MAC model for protecting confidentiality. It defines three rules:
+
+| Rule | Name | Meaning | Example |
+|------|------|---------|---------|
+| **Simple Security Property** | "No Read Up" | A subject can only read objects at or below their clearance | A "Secret" user cannot read "Top Secret" documents |
+| *** (Star) Property** | "No Write Down" | A subject can only write to objects at or above their clearance | A "Top Secret" user cannot write to "Secret" documents (prevents leaking secrets) |
+| **Discretionary Security Property** | — | Uses access matrix to determine discretionary access | Standard DAC check within MAC constraints |
+
+**Why "No Write Down" matters:** Without it, a user with "Top Secret" access could copy classified information into an unclassified document, effectively declassifying it.
+
+**The Biba Model (Integrity):**
+
+While Bell-LaPadula protects confidentiality, the Biba model protects integrity — ensuring data is not corrupted by lower-trust sources:
+
+| Rule | Name | Meaning |
+|------|------|---------|
+| **Simple Integrity Property** | "No Read Down" | A subject can only read objects at or above their integrity level | Prevents corruption from untrusted sources |
+| *** (Star) Integrity Property** | "No Write Up" | A subject can only write to objects at or below their integrity level | Prevents untrusted subjects from corrupting high-integrity data |
+
 **Strengths:**
 - Tamper-proof — users cannot bypass policies
 - Highly secure — suitable for classified environments
@@ -191,33 +212,90 @@ PBAC uses a **centralized policy engine** that evaluates all access decisions. P
 
 ### Access Control Structures
 
-**Access Control Matrix:**
-A theoretical table showing every user's permissions on every resource. While conceptually simple, these matrices are enormous and mostly empty (sparse) in practice.
+**Access Control Matrix (ACM):**
+
+The ACM is the theoretical foundation of all access control systems. It is a two-dimensional table where rows are subjects (users) and columns are objects (resources). Each cell contains the permissions that subject has on that object.
 
 ```
-          File_A  File_B  File_C  Printer
-Alice     rw      r       -       print
-Bob       r       rw      r       -
-Charlie   -       -       rw      print
+                 Object 1    Object 2    Object 3    Object 4
+               (Report)    (Database)  (Source)    (Payroll)
+              ┌─────────┬───────────┬───────────┬───────────┐
+Subject Alice │  read   │   read    │   read    │   none    │
+              ├─────────┼───────────┼───────────┼───────────┤
+Subject Bob   │  read   │   write   │   none    │   read    │
+              ├─────────┼───────────┼───────────┼───────────┤
+Subject Carol │  none   │   none    │   write   │   read    │
+              ├─────────┼───────────┼───────────┼───────────┤
+Subject Dave  │  read   │   read    │   read    │   write   │
+              └─────────┴───────────┴───────────┴───────────┘
 ```
 
-**Access Control List (ACL):**
-Permissions stored with the resource.
-- Efficient for: "Who can access this file?"
-- Inefficient for: "What can Alice access?"
-- Example: `File_A: Alice(rw), Bob(r)`
+**Why the ACM is theoretical, not practical:**
+- In a real system with 10,000 users and 100,000 files, the matrix has 1 billion cells
+- Most cells are empty (sparse matrix) — users typically access only a tiny fraction of resources
+- Storing the full matrix wastes enormous memory
+- Searching the full matrix for every access check would be prohibitively slow
+- Updating the matrix when permissions change is expensive
 
-**Capability List:**
-Permissions stored with the user.
-- Efficient for: "What can Alice access?"
-- Inefficient for: "Who can access this file?"
-- Example: `Alice: File_A(rw), File_B(r), Printer(print)`
+**1. Access Control List (ACL) — column-based storage:**
 
-**Hybrid approach (used in practice):**
-Most real systems combine approaches:
-1. Users are assigned to groups/roles (RBAC)
-2. Groups are referenced in resource ACLs
-3. This provides efficiency for both "who can access this?" and "what can Alice access?"
+Instead of storing the entire matrix, ACLs store each column (object) with its non-empty cells:
+
+```
+Object 1 (Report):      Alice: read, Bob: read, Dave: read
+Object 2 (Database):    Alice: read, Bob: write, Dave: read
+Object 3 (Source):      Alice: read, Carol: write, Dave: read
+Object 4 (Payroll):     Bob: read, Carol: read, Dave: write
+```
+
+- Each resource maintains a list of subjects and their permissions
+- Used by: Unix file permissions, Windows NTFS, AWS S3 bucket policies, network firewalls
+- **Efficient for:** "Who can access this resource?" (just read the object's ACL)
+- **Inefficient for:** "What can Alice access?" (must check every object's ACL)
+
+**Unix file permissions are a simplified ACL:**
+```bash
+-rw-r--r-- 1 alice dev_team  1234 Jan 15 report.txt
+│└┬┘└┬┘└┬┘
+│ │  │  └── Others: read only
+│ │  └───── Group (dev_team): read only
+│ └──────── Owner (alice): read + write
+└────────── File type
+```
+
+**2. Capability List — row-based storage:**
+
+Capability lists store each row (subject) with their non-empty cells:
+
+```
+Alice: [Object 1: read, Object 2: read, Object 3: read]
+Bob:   [Object 1: read, Object 2: write, Object 4: read]
+Carol: [Object 3: write, Object 4: read]
+Dave:  [Object 1: read, Object 2: read, Object 3: read, Object 4: write]
+```
+
+- Each subject maintains a list of resources they can access and how
+- Used by: OAuth access tokens, Kerberos tickets, API keys, browser capabilities
+- **Efficient for:** "What can Alice access?" (just read Alice's capability list)
+- **Inefficient for:** "Who can access this resource?" (must check every subject's capabilities)
+
+**3. Hybrid approach (used in practice):**
+
+Modern systems combine RBAC with ACLs for efficiency:
+
+```
+Group "Developers": Alice, Bob, Dave
+Group "Finance":    Bob, Carol, Dave
+
+Object 1 ACL: Developers: read
+Object 2 ACL: Developers: read, Finance: write
+Object 3 ACL: Developers: read
+Object 4 ACL: Finance: read, Dave: write
+```
+
+Now:
+- "What can Alice access?" → Alice is in Developers → Objects 1, 2, 3 with read
+- "Who can access Object 2?" → Developers and Finance → Alice, Bob, Dave + Bob, Carol, Dave
 
 ---
 

@@ -112,9 +112,89 @@ The complete implementation combining RBAC1 (hierarchy) and RBAC2 (constraints).
 - Too fine: Administrative overhead, role explosion, increased error rate
 - Best practice: Start coarse, refine based on audit findings and compliance requirements
 
+### The Role Engineering Process
+
+**Role engineering** is the systematic process of designing roles that accurately reflect organizational structure and job functions. It is not guesswork — it follows a structured methodology.
+
+**Why role engineering matters:**
+- Poorly designed roles violate least privilege or create excessive administrative burden
+- Well-designed roles scale with the organization and simplify audits
+- Role engineering is a standard IAM practice in enterprise environments
+
+**The Role Engineering Process (step by step):**
+
+**Phase 1: Data Collection**
+- Export current user-permission assignments from all systems
+- Gather organizational data: org chart, job descriptions, department structures
+- Interview managers and application owners about access needs
+- Document compliance requirements that affect access (SOX, HIPAA, etc.)
+
+**Phase 2: Analysis (Role Mining)**
+- Create a user-permission matrix (rows = users, columns = permissions)
+- Apply clustering algorithms or manual analysis to find natural groupings:
+  - Users with similar permissions likely share a job function
+  - Permissions that always appear together should be in the same role
+- Identify outliers — users with unique permission combinations may indicate:
+  - Special job functions deserving their own role
+  - Access creep that should be cleaned up
+
+**Example user-permission matrix:**
+```
+Permission      Alice  Bob  Carol  Dave  Eve  Frank
+read_email        ✓     ✓     ✓     ✓     ✓     ✓
+access_internet   ✓     ✓     ✓     ✓     ✓     ✓
+read_finance      ✓     ✓     -     -     -     -
+write_finance     ✓     -     -     -     -     -
+approve_expense   -     ✓     -     -     -     -
+read_code         -     -     ✓     ✓     ✓     -
+write_code        -     -     ✓     ✓     -     -
+deploy_prod       -     -     -     ✓     -     -
+read_hr           -     -     -     -     ✓     ✓
+write_hr          -     -     -     -     ✓     -
+```
+
+**Clustering observations:**
+- Alice + Bob share finance access → "Finance" role candidate
+- Carol + Dave + Eve share code access → "Developer" role candidate
+- Eve + Frank share HR access → "HR" role candidate
+- Alice has unique write_finance → maybe "Senior Finance" or just keep in Finance
+- Dave has unique deploy_prod → "Senior Developer" or separate role
+
+**Phase 3: Role Definition**
+- Define candidate roles based on clustering
+- Assign permissions to each role
+- Name roles clearly and consistently
+- Document the business justification for each role
+
+**Phase 4: Validation**
+- Review candidate roles with business stakeholders
+- Verify roles align with actual job functions
+- Check for SoD conflicts within and between roles
+- Test role assignments against real users
+
+**Phase 5: Implementation**
+- Create roles in the IAM system
+- Migrate users from direct permissions to role assignments
+- Update provisioning workflows to use roles
+- Communicate changes to users and managers
+
+**Phase 6: Maintenance**
+- Monitor role usage (are all roles actually used?)
+- Review quarterly for relevance
+- Adjust as organizational structure changes
+- Retire roles that are no longer needed
+
+**Role Mining Approaches:**
+
+| Approach | How It Works | Best For |
+|----------|-------------|----------|
+| **Top-down** | Start with job descriptions and org chart; define roles theoretically | New IAM implementation, clean slate |
+| **Bottom-up** | Analyze existing permissions; discover patterns | Existing environments with accumulated access |
+| **Hybrid** | Combine both: use top-down for structure, bottom-up for validation | Most real-world implementations |
+
 ### RBAC Best Practices
 
-1. **Role mining:** Before defining roles, analyze existing user-permission assignments to discover natural groupings. Data-driven role design is more effective than top-down guessing.
+1. **Start with role mining:** Before defining roles, analyze existing user-permission assignments to discover natural groupings. Data-driven role design is more effective than top-down guessing.
 
 2. **Regular reviews:** Conduct quarterly audits of role definitions and assignments. Remove unused roles. Verify that role members still need their access.
 

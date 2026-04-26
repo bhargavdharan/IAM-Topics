@@ -103,6 +103,56 @@ Push notification MFA works as follows:
 
 **MFA fatigue attacks:** Attackers spam users with push notifications hoping they will approve one accidentally. Modern systems counter this with **numbered challenge verification** — the login screen and phone both display a matching number that the user must verify before approving.
 
+### MFA Recovery: What Happens When You Lose Your Device?
+
+This is one of the most common real-world MFA questions, yet it is rarely explained thoroughly. Losing your phone, having it stolen, or resetting it should not mean permanent account lockout.
+
+**Recovery Methods Compared:**
+
+| Recovery Method | How It Works | Security Level | Risk |
+|----------------|--------------|---------------|------|
+| **Backup Codes** | Single-use codes generated during MFA setup, stored offline | High (if stored securely) | Codes can be lost, stolen, or photographed |
+| **Secondary MFA Method** | Register a second device (backup phone, hardware key) | High | Second device also needs protection |
+| **Recovery Email/SMS** | Code sent to registered email or phone number | Medium | Email/SMS can be compromised |
+| **Identity Verification** | Answer security questions, upload ID, contact support | Low-Medium | Social engineering of support staff |
+| **Account Reset** | Administrator overrides MFA | Low | Bypasses MFA entirely; requires strict controls |
+
+**Backup Codes in Detail:**
+
+Backup codes are the most common recovery mechanism. They work as follows:
+
+1. **Generation:** During MFA enrollment, the server generates 8-10 single-use recovery codes. These are cryptographically random strings (e.g., `1234 5678 9012`).
+2. **Storage:** The server stores a hash of each code (not the code itself — just like passwords).
+3. **User storage:** The user is instructed to print or save these codes securely (not on the same phone).
+4. **Usage:** When the primary MFA device is unavailable, the user enters a backup code instead of a TOTP code.
+5. **Validation:** The server hashes the entered code and compares it to stored hashes. If matched, the code is marked as used and cannot be reused.
+6. **Regeneration:** Once most codes are used, the user should generate a new set.
+
+**Critical security practice:**
+- Treat backup codes like passwords — store them in a password manager or physically secured location
+- Never store backup codes on the same device used for MFA
+- Never photograph backup codes with a cloud-synced camera
+- Regenerate codes immediately if you suspect they were compromised
+
+**Account Recovery Risk:**
+
+The account recovery process is often the weakest link in MFA security. Attackers know this and target recovery channels:
+
+| Attack Vector | How It Works | Prevention |
+|--------------|--------------|------------|
+| **Support social engineering** | Attacker calls support, pretends to be you, claims lost phone | Require manager approval for MFA resets; verify identity through multiple channels |
+| **Recovery email compromise** | Attacker breaches your recovery email, uses "forgot MFA" flow | Protect recovery email with its own strong MFA |
+| **SIM swapping** | Attacker transfers your phone number, intercepts recovery SMS | Avoid SMS recovery; use app-based or hardware backup |
+| **Insider threat** | Malicious support agent resets MFA for attacker | Audit all MFA resets; require dual approval for privileged accounts |
+
+**Best practice for organizations:**
+- Require two MFA methods (primary + backup) for privileged accounts
+- Log and alert on all MFA reset events
+- Require manager or security team approval for MFA bypass
+- Train users on backup code storage before they need them
+
+---
+
 ### MFA Bypass Techniques
 
 Understanding how MFA fails is as important as understanding how it works:

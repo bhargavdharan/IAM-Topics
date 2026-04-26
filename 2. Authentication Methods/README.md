@@ -154,13 +154,70 @@ As computers get faster, attackers can compute more hashes per second. **Adaptiv
 **Why "memory-hard" matters:** GPUs and specialized cracking hardware (ASICs) excel at parallel computation but have limited memory. An algorithm that requires 64 MB of RAM per hash operation cannot be efficiently parallelized on GPUs.
 
 **Step 5: Peppering — the secret ingredient**
-A **pepper** is a secret value shared across all passwords, stored separately from the database (often in application configuration or a hardware security module). Even if the database is stolen, attackers lack the pepper.
+A **pepper** is a secret value shared across all passwords, stored separately from the database (often in application configuration, environment variable, or a hardware security module). Even if the database is stolen, attackers lack the pepper.
 
 ```
 Stored in DB:    hash(password + salt)
-Stored in app:   PEPPER = "secret_value_123"
+Stored in app:   PEPPER = "secret_value_123" (in config file, not database)
 Actual verify:   hash(password + salt + pepper)
 ```
+
+**Salt vs Pepper — critical distinction:**
+
+| Property | Salt | Pepper |
+|----------|------|--------|
+| **Unique per password?** | Yes — every password has a different random salt | No — one pepper for the entire application |
+| **Stored with hash?** | Yes — salt is stored in the database next to the hash | No — pepper is stored separately (config, HSM) |
+| **Purpose** | Prevents rainbow table attacks by making each hash unique | Prevents brute force even if database is stolen |
+| **If attacker gets database only** | Cannot use pre-computed tables; must attack each hash individually | Cannot verify any guesses without the pepper |
+| **If attacker gets database + app** | Still secure (adaptive hashing + unique salts) | Compromised (but defense in depth still helped) |
+
+**Why use both?** Salt prevents rainbow tables. Pepper adds a layer of defense even if the database alone is breached. Together they provide defense in depth.
+
+---
+
+### Designing Password Policies in Practice
+
+A password policy is not just "minimum 8 characters." A well-designed policy balances security, usability, and enforceability.
+
+**Components of a comprehensive password policy:**
+
+| Component | Good Practice | Common Mistake |
+|-----------|--------------|---------------|
+| **Minimum length** | 12-16 characters encouraged; 8 absolute minimum | Arbitrary complexity rules (one uppercase, one symbol) that produce `P@ssw0rd!` |
+| **Maximum length** | At least 64 characters (support passphrases) | Limiting to 16 characters (prevents passphrases) |
+| **Complexity** | Check against known-bad password lists; allow passphrases | Require specific character types that users circumvent |
+| **Expiration** | Only on suspected compromise; NOT periodic forced changes | 90-day forced changes (causes `Password1`, `Password2` patterns) |
+| **History** | Prevent last 5-10 passwords | Prevent last 24 passwords (users cycle through patterns) |
+| **Account lockout** | 5 failed attempts → 15-minute lockout → alert security | 3 attempts → permanent lockout (enables denial of service) |
+| **MFA requirement** | Require MFA for all accounts, especially privileged | MFA "recommended" but not enforced |
+| **Password manager support** | Allow paste; encourage password managers | Disable paste (breaks password managers, hurts security) |
+
+**NIST SP 800-63B (2017) — the modern standard:**
+
+NIST fundamentally changed password guidance in 2017, moving away from complexity rules:
+- **Verifiers SHALL NOT impose composition rules** (no "one uppercase, one number, one symbol")
+- **Verifiers SHALL NOT require periodic password changes** unless compromise is suspected
+- **Verifiers SHALL compare passwords against breached password lists**
+- **Verifiers SHALL support paste functionality** (enabling password managers)
+- **Verifiers SHALL allow at least 64 characters** (supporting passphrases)
+
+**Why these changes?** Research showed that complexity rules produce predictable patterns (`P@ssw0rd1`, `Password123!`). Forced rotation causes incremental passwords. Password managers and passphrases are genuinely more secure.
+
+**What users should actually do:**
+1. Use a reputable password manager (1Password, Bitwarden, KeePass)
+2. Let the password manager generate unique 20+ character passwords for every site
+3. Memorize only one strong master password (a passphrase: `correct-horse-battery-staple`)
+4. Enable MFA everywhere it is offered
+5. Never reuse passwords across sites
+
+**What organizations should enforce:**
+1. Minimum 12-16 characters
+2. Check against breached password databases (Have I Been Pwned API)
+3. Require MFA for all users
+4. Do NOT force periodic password changes
+5. Support password managers (allow paste, no maximum length limits)
+6. Implement account lockout with alerting
 
 ### How Biometric Authentication Works Under the Hood
 
