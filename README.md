@@ -1,12 +1,12 @@
 # Identity and Access Management (IAM) Learning Platform
 
-A comprehensive, interactive learning platform covering the full spectrum of Identity and Access Management — from foundational concepts to cutting-edge authentication technologies. Each module combines deep theoretical explanations with hands-on Python simulations and an interactive React frontend.
+A comprehensive, interactive learning platform covering the full spectrum of Identity and Access Management — from foundational concepts to AI-driven agentic security. Each module combines deep theoretical explanations with hands-on Python simulations and an interactive React frontend.
 
 ---
 
 ## What You Will Learn
 
-This platform covers 15 IAM topics in depth:
+This platform covers 16 IAM topics in depth:
 
 | # | Module | Focus |
 |---|--------|-------|
@@ -25,6 +25,7 @@ This platform covers 15 IAM topics in depth:
 | 13 | **Zero Trust Architecture** | Verify explicitly, least privilege, micro-segmentation, ZTNA |
 | 14 | **Cloud IAM** | AWS, Azure, GCP IAM models, policies, cross-account access |
 | 15 | **Future of IAM** | Passwordless, decentralized identity, AI-driven security, behavioral biometrics |
+| 16 | **AI-Driven IAM and Agentic Security** | ML threat detection, agentic AI automation, LLM policy generation, AI audit |
 
 ---
 
@@ -314,7 +315,7 @@ Identity-Access-Management/
 ├── 02. Authentication Methods/
 │   ├── README.md
 │   └── projects/
-├── ... (modules 3-15 follow same pattern)
+├── ... (modules 3-16 follow same pattern)
 ├── backend/
 │   ├── app.py              ← Flask REST API
 │   ├── routes/
