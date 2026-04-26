@@ -308,10 +308,10 @@ mysql -u root -p < database/schema.sql
 
 ```
 Identity-Access-Management/
-├── 1. Introduction to IAM/
+├── 01. Introduction to IAM/
 │   ├── README.md          ← Comprehensive module guide
 │   └── projects/           ← Python simulations
-├── 2. Authentication Methods/
+├── 02. Authentication Methods/
 │   ├── README.md
 │   └── projects/
 ├── ... (modules 3-15 follow same pattern)
