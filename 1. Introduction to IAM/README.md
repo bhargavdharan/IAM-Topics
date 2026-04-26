@@ -361,6 +361,210 @@ Audit Log (complete record preserved)
 
 ---
 
+## IAM in Practice: Support, Implementation, and Development
+
+This section explains how IAM actually works in real organizations — because most companies do not build IAM systems from scratch. They buy them, configure them, and maintain them.
+
+### The IAM Technology Landscape
+
+Organizations acquire IAM capabilities in three ways:
+
+| Approach | What It Means | Examples | When Used |
+|----------|--------------|----------|-----------|
+| **Commercial Off-The-Shelf (COTS)** | Buy an existing product; configure and deploy it | Okta, Azure AD, SailPoint, CyberArk, Ping Identity | Most common; fastest time to value |
+| **Custom Development** | Build IAM functionality in-house | Custom login portal, bespoke provisioning scripts, internal auth service | Unique requirements; regulatory constraints; large tech companies |
+| **Hybrid** | COTS for core IAM; custom for specialized needs | Okta for SSO + custom provisioning connector for legacy ERP | Most enterprise environments |
+
+**Reality check:** 90%+ of organizations use COTS products for core IAM. Building an identity provider, credential vault, or governance platform from scratch requires enormous investment and carries significant security risk. Even Google, Microsoft, and Amazon use their own commercial identity services rather than building custom alternatives.
+
+### Support vs Implementation vs Development
+
+These are three distinct career tracks within IAM, and understanding the difference is critical for career planning.
+
+---
+
+#### 1. IAM Support (Operating Existing Solutions)
+
+**What Support Engineers do:**
+Support engineers operate and troubleshoot IAM systems that are already deployed. The solution exists; their job is to keep it running and help users.
+
+**Typical daily work:**
+- Reset passwords and unlock accounts
+- Troubleshoot SSO login failures ("Why can't I access Salesforce?")
+- Resolve MFA issues ("My phone broke; I need MFA reset")
+- Investigate failed authentication attempts in logs
+- Handle access requests and provisioning tickets
+- Respond to alerts from the IAM system
+- Escalate complex issues to vendors or senior engineers
+
+**What they work with:**
+- **Identity Providers:** Okta, Azure AD, Ping Identity, OneLogin
+- **Directories:** Active Directory, LDAP, Azure AD Connect
+- **PAM tools:** CyberArk, BeyondTrust, Delinea (formerly Thycotic)
+- **IGA platforms:** SailPoint, Saviynt, Microsoft Entitlement Management
+- **SSO portals:** Company intranet login pages, app launchers
+
+**Skills needed for Support:**
+
+| Skill | Why It Matters | Depth Required |
+|-------|---------------|---------------|
+| **Active Directory / LDAP** | Most issues involve directory lookups, group membership, or replication | Deep — you need to read AD logs, understand OU structure, run LDAP queries |
+| **SAML / OIDC basics** | SSO failures require understanding token flows and certificate issues | Intermediate — read SAML assertions, check metadata, identify certificate expiry |
+| **Basic scripting** | Automate repetitive tasks (PowerShell for AD, Python for API calls) | Intermediate — write and modify scripts |
+| **Log analysis** | Authentication logs tell you what happened and why | Intermediate — read and correlate logs from multiple systems |
+| **Networking basics** | Connectivity issues cause many IAM problems | Intermediate — understand DNS, firewalls, TLS/SSL |
+| **Communication** | You interact with frustrated users daily | Essential — explain technical issues to non-technical people |
+
+**Key awareness for Support:**
+- You do not decide which product to buy — that was decided before you joined
+- You work within the product's limitations; you cannot redesign it
+- Vendor documentation and support tickets are your primary tools
+- Most problems have happened before — knowledge bases are valuable
+- Escalation paths exist for bugs or product limitations
+
+**Career levels in Support:**
+- **L1:** Password resets, account unlocks, basic provisioning, ticket triage
+- **L2:** Complex provisioning, SSO troubleshooting, MFA problems, group policy issues
+- **L3:** Escalation handling, incident response, root cause analysis, vendor coordination
+
+---
+
+#### 2. IAM Implementation (Deploying and Configuring Solutions)
+
+**What Implementation Engineers / Consultants do:**
+Implementation engineers deploy new IAM solutions or reconfigure existing ones. They take a product (or multiple products) and make it work for the organization's specific requirements.
+
+**Typical projects:**
+- Deploy Okta or Azure AD for workforce SSO
+- Implement SailPoint for access governance and certification
+- Configure CyberArk for privileged access management
+- Set up Azure AD Connect for hybrid identity synchronization
+- Integrate a new SaaS application with corporate SSO
+- Migrate from one IdP to another (e.g., on-premises AD FS to cloud Azure AD)
+- Design and deploy MFA across all users
+- Implement Identity Governance workflows (access requests, approvals, certifications)
+
+**What they work with:**
+- The **same products** as Support, but they configure them rather than operate them
+- **Project documentation:** Requirements documents, design documents, test plans
+- **Integration tools:** APIs, SCIM connectors, SAML/OIDC configuration, PowerShell scripts
+- **Multiple stakeholders:** Security team, IT team, application owners, business users
+
+**Skills needed for Implementation:**
+
+| Skill | Why It Matters | Depth Required |
+|-------|---------------|---------------|
+| **Product-specific expertise** | Each IAM product has its own architecture, configuration language, and limitations | Deep for your primary products — you are the expert |
+| **SAML / OIDC / OAuth** | Every SSO integration requires protocol configuration | Deep — you configure assertions, claims, scopes, grant types, metadata exchange |
+| **Directory services** | Implementing IAM requires connecting to AD, LDAP, or cloud directories | Deep — design sync architecture, attribute mapping, replication |
+| **API integration** | Connecting IAM to applications requires REST API work | Intermediate-Deep — read API docs, build connectors, handle errors |
+| **Project management** | Implementations have timelines, milestones, and stakeholders | Intermediate — track progress, manage scope, communicate status |
+| **Security architecture** | Design secure flows that meet organizational requirements | Intermediate — understand threat models, design mitigations |
+| **Scripting / Automation** | Configure, migrate, and integrate using code | Intermediate-Deep — PowerShell, Python, or product-specific languages |
+
+**Key awareness for Implementation:**
+- Requirements gathering is half the job — you cannot implement what you do not understand
+- Legacy systems are the hardest part — modern apps support SAML/OIDC; old ones do not
+- Rollback plans are essential — if the go-live fails, you must restore service quickly
+- Testing is critical — test every user type, every application, every edge case
+- Change management matters — users need training on new login flows
+- Documentation is your legacy — the support team will live with what you build
+
+**Career levels in Implementation:**
+- **Junior Implementation Engineer:** Configure simple integrations, follow runbooks, assist senior engineers
+- **Implementation Engineer:** Lead medium projects, design integrations, troubleshoot complex configurations
+- **Senior Implementation Engineer / Architect:** Design enterprise-wide IAM architecture, lead multi-product deployments, evaluate vendors
+
+---
+
+#### 3. IAM Development (Building Custom Solutions and Integrations)
+
+**What IAM Developers do:**
+IAM developers write code to build custom IAM functionality, integrate systems that do not have out-of-the-box connectors, and extend COTS products through APIs and plugins.
+
+**Typical work:**
+- Build custom provisioning connectors for legacy applications
+- Develop CIAM (Customer IAM) features — user registration, login, profile management
+- Write authentication middleware for custom applications
+- Build automated access review and certification tools
+- Develop custom workflows for access requests and approvals
+- Integrate IAM systems with SIEM, ITSM, or HR systems
+- Build identity synchronization tools between directories
+- Develop custom reporting and analytics dashboards
+
+**What they work with:**
+- **Programming languages:** Python, Java, JavaScript/TypeScript, C#, Go
+- **IAM protocols and libraries:** OAuth 2.0, OIDC, SAML, SCIM, LDAP, Kerberos
+- **APIs:** REST, GraphQL, SOAP (for legacy systems)
+- **Databases:** SQL and NoSQL for identity stores and audit logs
+- **Cloud services:** AWS IAM APIs, Azure Graph API, Google Cloud IAM
+- **Frameworks:** Spring Security, Passport.js, Auth0 SDKs, Okta SDKs
+
+**Skills needed for Development:**
+
+| Skill | Why It Matters | Depth Required |
+|-------|---------------|---------------|
+| **Software engineering** | You are building production systems that handle authentication | Deep — clean code, testing, security, scalability |
+| **Cryptography basics** | You work with hashing, encryption, JWTs, certificates | Intermediate-Deep — understand what you are using and why |
+| **IAM protocols** | Implementing OAuth, OIDC, SAML, SCIM requires protocol knowledge | Deep — you implement the specs, not just configure them |
+| **API design** | Building IAM services means designing APIs others will use | Intermediate-Deep — RESTful design, versioning, error handling |
+| **Security coding practices** | Authentication code is high-risk — vulnerabilities are critical | Deep — OWASP Top 10, secure coding, input validation, output encoding |
+| **Database design** | Identity stores and audit logs require proper schema design | Intermediate — normalization, indexing, query optimization |
+| **DevOps / CI/CD** | Deploy IAM components safely and reliably | Intermediate — containers, pipelines, infrastructure as code |
+
+**Key awareness for Development:**
+- Do not build what you can buy — custom IAM components are expensive to maintain and secure
+- When you must build, follow standards (OAuth 2.0, OIDC, SCIM) rather than inventing protocols
+- Security review is mandatory — authentication code must be reviewed by security experts
+- Testing is non-negotiable — a bug in login code locks out all users
+- Documentation is code — other developers and support staff depend on your docs
+- You are building the keys to the kingdom — take that responsibility seriously
+
+**Career levels in Development:**
+- **Junior IAM Developer:** Write scripts and small features, fix bugs, maintain existing code
+- **IAM Developer:** Build connectors and integrations, implement authentication flows, develop features
+- **Senior IAM Developer / Engineer:** Design architecture, build core IAM services, lead technical decisions
+
+---
+
+### Support vs Implementation vs Development — Side by Side
+
+| Aspect | Support | Implementation | Development |
+|--------|---------|---------------|-------------|
+| **Primary question** | "Why is it broken?" | "How do we deploy this?" | "How do we build this?" |
+| **Code involvement** | Scripts for automation | Scripts for configuration | Full application development |
+| **Product focus** | Operate existing products | Deploy and configure products | Build custom or extend products |
+| **User interaction** | End users with problems | Project stakeholders | Product managers, other developers |
+| **Documentation type** | Runbooks, KB articles | Design docs, test plans | API docs, code comments, architecture docs |
+| **Primary deliverable** | Resolved tickets | Working IAM environment | Working code and integrations |
+| **Typical employer** | Any organization with IAM | Consulting firms, system integrators, large enterprises | Tech companies, product vendors, enterprises with custom needs |
+| **Entry barrier** | Lower — certifications help | Medium — product training required | Higher — computer science foundation needed |
+
+### Career Progression Between Tracks
+
+Movement between tracks is common and valuable:
+
+```
+Support Engineer → Implementation Engineer
+         │                │
+         │ (deep product knowledge enables better implementations)
+         │                │
+         └────────────────┘
+                │
+                ▼
+     IAM Developer (understanding real-world problems helps build better solutions)
+                │
+                ▼
+     IAM Architect / Consultant (combines all three perspectives)
+```
+
+**Why cross-track experience is valuable:**
+- **Support → Implementation:** You know the common failure modes and design to avoid them
+- **Implementation → Development:** You know what integrations are painful and build better APIs
+- **Development → Support:** You understand the code and can debug faster than anyone
+
+---
+
 ## How IAM Systems Work
 
 ### The Access Request Flow
@@ -459,6 +663,7 @@ User requests access to Resource X
 | "SoD only matters in finance" | SoD applies to any process where one person could cause harm: code deployment, data management, system administration. |
 | "Once authenticated, you're trusted forever" | Good IAM systems re-evaluate trust continuously: session timeouts, step-up authentication, risk-based re-verification. |
 | "IAM is an IT problem, not a business problem" | IAM decisions require business input: who needs what access, what are the risks, what is the compliance requirement. |
+| "Organizations build their own IAM from scratch" | 90%+ of organizations buy COTS products (Okta, Azure AD, SailPoint). Custom development is rare and reserved for unique requirements. |
 
 ---
 
@@ -495,7 +700,15 @@ Document the complete JML lifecycle for one role in your organization or a hypot
 - LEAVER: What is revoked and when?
 - Identify any gaps in the current process
 
-### Exercise 5: Run the Simulations
+### Exercise 5: Career Track Analysis
+Research three IAM job postings (one for Support, one for Implementation, one for Development). Compare:
+- Required skills and certifications
+- Years of experience expected
+- Product knowledge required
+- Coding requirements
+- Salary ranges
+
+### Exercise 6: Run the Simulations
 - `identity_lifecycle_sim.py` — Simulates JML processes
 - `iam_maturity_assessment.py` — Evaluates IAM program maturity
 - `iam_concept_matcher.py` — Tests knowledge of IAM terminology
@@ -543,3 +756,7 @@ Interactive quiz covering:
 8. A new developer starts and is given full production database access "just in case." Identify all the problems with this decision using IAM principles.
 9. How does the CIA Triad relate to IAM? Give one IAM example for each pillar (Confidentiality, Integrity, Availability).
 10. Design an IAM onboarding process for a hospital: a new nurse needs access to patient records, scheduling systems, and the medication administration system. What access should be granted immediately, what should require approval, and what should be denied?
+11. What is the difference between IAM Support, IAM Implementation, and IAM Development? Which skills overlap and which are unique to each track?
+12. Why do most organizations buy COTS IAM products rather than building from scratch? What are the risks of building a custom identity provider?
+13. A company wants to deploy SSO for 50 SaaS applications. Should they hire a Support engineer, an Implementation engineer, or a Developer? Justify your answer.
+14. What skills would you need to move from IAM Support to IAM Implementation? What additional skills to move from Implementation to Development?
